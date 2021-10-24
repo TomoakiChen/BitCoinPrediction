@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#import datetime
+#import datetime #https://stackoverflow.com/questions/50639415/attributeerror-module-datetime-has-no-attribute-now 這個用起來有點問題，換下面的
 from datetime import datetime
 from PyWeb import HtmlClient
 from NewsInfo import NewsInfo
