@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 from PyWeb import HtmlClient
 from NewsInfo import NewsInfo
-
+class LTNClient:
+    def __init__(self, html_client = None):
+        self._html_client = html_client
+    def _setupHtmlClient(html_client):
+        self._html_client = HtmlClient()
 # --------------------------------- 以下是 自由時報格式 ---------------------------------
 news_info_list = []
-
 url = 'https://news.ltn.com.tw/topic/%E6%AF%94%E7%89%B9%E5%B9%A3'
+if(html)
 html_client = HtmlClient()
 html_parsed_data = html_client.getHtml(url)
 #print(parsed_data)
