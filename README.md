@@ -3,7 +3,7 @@
   * 已完成
     * 「自由時報新聞」的爬蟲的嘗試
   * 嘗試中
-    * 「Yahoo 新聞」
+    * 「Yahoo 新聞」：他不是換頁，而是拉到下面載入。
 
 [目前有的lib](https://pypi.org/project/Taiwan-News-Crawler/)
 此lib不是從topic目錄開爬的樣子
