@@ -1,3 +1,8 @@
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 import bs4
 import urllib.request as req
 
@@ -17,15 +22,55 @@ class HttpClient:
             pageData = res.read().decode(encoded)
         return pageData
 
-#
-
 
 class HtmlClient:
 
     def __init__(self):
-        self.httpClient = HttpClient()
+        self._httpClient = HttpClient()
 
     def getHtml(self, url):
-        pageData = self.httpClient.sendRequest(url)
+        pageData = self._httpClient.sendRequest(url)
         parsedData = bs4.BeautifulSoup(pageData, "lxml")
         return parsedData
+
+
+# ============================================================================================================================================
+class WebDriverClient:
+    # _auto_load_website_actions_ =
+    def __init__(self, driver_type='Chrome'):
+        self._browser_driver = self._setupBrowserDriver_(driver_type)
+
+    def _setupBrowserDriver_(self, driver_type):
+        if driver_type == 'Chrome':
+            op = webdriver.ChromeOptions()
+            # 這樣可以不用打開實際的瀏覽器 https://stackoverflow.com/questions/7593611/selenium-testing-without-browser
+            op.add_argument('headless')
+            return webdriver.Chrome(options=op)
+        elif driver_type == 'Firefox':
+            return webdriver.Firefox()
+        else:
+            return webdriver.Chrome()
+
+    def getHtml(self, url, action_chains=None):
+        self._browser_driver.get(url)
+        action_chains = self.obtainAction4BottomLoad()
+        if action_chains != None:
+            action_chains.perform()
+        page_data = self._browser_driver.page_source
+        parsed_data = bs4.BeautifulSoup(page_data, "lxml")
+        return parsed_data
+
+    def obtainAction4BottomLoad(self):
+        container_element = self._browser_driver.find_element(By.TAG_NAME, 'body')
+        actions = webdriver.ActionChains(self._browser_driver)
+        actions.click(container_element)
+        # print("click", container_element)
+        actions.key_down(Keys.END)
+        # print("[End] key down")
+        actions.pause(2)
+        actions.key_down(Keys.END)
+        # print("[End] key down") #這邊程式上不會等.........
+        actions.pause(2)
+        actions.key_down(Keys.END)
+        # print("[End] key down")
+        return actions
