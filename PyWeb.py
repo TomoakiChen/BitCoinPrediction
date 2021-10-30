@@ -64,13 +64,9 @@ class WebDriverClient:
         container_element = self._browser_driver.find_element(By.TAG_NAME, 'body')
         actions = webdriver.ActionChains(self._browser_driver)
         actions.click(container_element)
-        # print("click", container_element)
         actions.key_down(Keys.END)
-        # print("[End] key down")
         actions.pause(2)
         actions.key_down(Keys.END)
-        # print("[End] key down") #這邊程式上不會等.........
         actions.pause(2)
         actions.key_down(Keys.END)
-        # print("[End] key down")
         return actions
