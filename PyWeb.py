@@ -60,6 +60,9 @@ class WebDriverClient:
         parsed_data = bs4.BeautifulSoup(page_data, "lxml")
         return parsed_data
 
+    """
+    # 目前難以寫成一種方便使用的底層 method，此專案中先在 YahooNewsClient
+    # 中自行處理
     def obtainAction4BottomLoad(self):
         container_element = self._browser_driver.find_element(By.TAG_NAME, 'body')
         actions = webdriver.ActionChains(self._browser_driver)
@@ -70,3 +73,4 @@ class WebDriverClient:
         actions.pause(2)
         actions.key_down(Keys.END)
         return actions
+    """

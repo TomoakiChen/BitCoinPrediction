@@ -4,10 +4,10 @@ from datetime import datetime
 from PyWeb import HtmlClient, WebDriverClient
 from NewsInfo import NewsInfo
 
- 
-class LTNClient(HtmlClient):
 
-    def __init__(self, news_since=datetime.now().date(), news_until=datetime.now().date(), max_pages=10):
+class LTNNewsClient(HtmlClient):
+
+    def __init__(self, news_since=datetime.now().date(), news_until=datetime.now().date()):
         super().__init__()
         self._url_pattern = 'https://news.ltn.com.tw/topic/%E6%AF%94%E7%89%B9%E5%B9%A3/${PAGE}'
         self._news_since = news_since
@@ -15,15 +15,17 @@ class LTNClient(HtmlClient):
 
         self._now_url = None
         self._now_page = 1
-        self._max_pages = max_pages
         self._pub_datetime_formats = ['%Y/%m/%d %H:%M', '%Y/%m/%d']
 
-    def getNewsInfoList(self):
+    def findByMaxPages(self, max_pages=10):
         news_info_list = []
-        while self._now_page <= self._max_pages:
-            #self._miningOnePage(news_info_list)
+        while self._now_page <= max_pages:
             news_info_list = self._miningOnePage(news_info_list)
         return news_info_list
+
+    def findByInterval(self):
+        pass
+
 
     def _doSetupNowUrl(self):
         self._now_url = self._url_pattern.replace('${PAGE}', str(self._now_page) )
@@ -105,12 +107,12 @@ class YahooNewsClient(WebDriverClient):
 
 
 # --------------------------------- 以下是 自由時報格式 ---------------------------------
-ltn_client = LTNClient()
+ltn_client = LTNNewsClient()
 
-ltn_news_list = ltn_client.getNewsInfoList()
-print(len(ltn_news_list))
-
+ltn_news_list = ltn_client.findByMaxPages()
+#print(ltn_news_list)
 for ltn_news in ltn_news_list:
     print(ltn_news)
+print("total nums = ", len(ltn_news_list))
 
 # --------------------------------- 以上是 自由時報格式 ---------------------------------
