@@ -4,7 +4,7 @@ from datetime import datetime
 from PyWeb import HtmlClient, WebDriverClient
 from NewsInfo import NewsInfo
 
-
+ 
 class LTNClient(HtmlClient):
 
     def __init__(self, news_since=datetime.now().date(), news_until=datetime.now().date(), max_pages=10):
@@ -79,7 +79,6 @@ class YahooNewsClient(WebDriverClient):
     def getNewsInfoList(self, new_amount):
         news_info_list = []
         while self._now_page <= self._max_pages:
-            #self._miningOnePage(news_info_list)
             news_info_list = self._miningOnePage(news_info_list)
         return news_info_list
 
