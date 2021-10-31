@@ -38,9 +38,9 @@ class HtmlClient:
 class WebDriverClient:
     # _auto_load_website_actions_ =
     def __init__(self, driver_type='Chrome'):
-        self._browser_driver = self._setupBrowserDriver_(driver_type)
+        self._browser_driver = self._setupBrowserDriver(driver_type)
 
-    def _setupBrowserDriver_(self, driver_type):
+    def _setupBrowserDriver(self, driver_type):
         if driver_type == 'Chrome':
             op = webdriver.ChromeOptions()
             # 這樣可以不用打開實際的瀏覽器 https://stackoverflow.com/questions/7593611/selenium-testing-without-browser
