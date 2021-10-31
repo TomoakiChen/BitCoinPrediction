@@ -60,7 +60,7 @@ class WebDriverClient:
         parsed_data = bs4.BeautifulSoup(page_data, "lxml")
         return parsed_data
 
-    def obtainAction4BottomLoad(self):
+    def obtainAction4BottomLoad(self): 
         container_element = self._browser_driver.find_element(By.TAG_NAME, 'body')
         actions = webdriver.ActionChains(self._browser_driver)
         actions.click(container_element)
