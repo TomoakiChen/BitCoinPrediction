@@ -1,42 +1,42 @@
 class NewsInfo:
     def __init__(self):
-        self._link = ''#None
-        self._title = ''#None
-        self._content =''# None
-        self._pub_date_time = None
+        self.__link = ''#None
+        self.__title = ''#None
+        self.__content =''# None
+        self.__pub_date_time = None
 
     def getLink(self):
-        return self._link
+        return self.__link
 
     def setLink(self, link):
-        self._link = link
+        self.__link = link
 
     def getTitle(self):
-        return self._title
+        return self.__title
 
     def setTitle(self, title):
-        self._title = title
+        self.__title = title
 
     def getContent(self):
-        return self._content
+        return self.__content
 
     def setContent(self, content):
-        self._content = content
+        self.__content = content
 
     def getPubDateTime(self):
-        return self._pub_date_time
+        return self.__pub_date_time
 
     def setPubDateTime(self, pub_date_time):
-        self._pub_date_time = pub_date_time
+        self.__pub_date_time = pub_date_time
 
     def __str__(self):
         result = '{'
-        result += 'link = "' + self._link + '"'
+        result += 'link = "' + self.__link + '"'
         result += ', '
-        result += 'title = "' + self._title + '"'
+        result += 'title = "' + self.__title + '"'
         result += ', '
-        result += 'content = "' + self._content + '"'
+        result += 'content = "' + self.__content + '"'
         result += ', '
-        result += 'pub_date_time = "' + str(self._pub_date_time) + '"'  # https://stackoverflow.com/questions/27980579/concatenate-str-and-nonetype-objects
+        result += 'pub_date_time = "' + str(self.__pub_date_time) + '"'  # https://stackoverflow.com/questions/27980579/concatenate-str-and-nonetype-objects
         result += '}'
         return result

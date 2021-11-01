@@ -26,10 +26,10 @@ class HttpClient:
 class HtmlClient:
 
     def __init__(self):
-        self._httpClient = HttpClient()
+        self.__httpClient = HttpClient()
 
     def getHtml(self, url):
-        pageData = self._httpClient.sendRequest(url)
+        pageData = self.__httpClient.sendRequest(url)
         parsedData = bs4.BeautifulSoup(pageData, "lxml")
         return parsedData
 
@@ -38,9 +38,9 @@ class HtmlClient:
 class WebDriverClient:
     # _auto_load_website_actions_ =
     def __init__(self, driver_type='Chrome'):
-        self._browser_driver = self._setupBrowserDriver(driver_type)
+        self.__browser_driver = self.__setupBrowserDriver(driver_type)
 
-    def _setupBrowserDriver(self, driver_type):
+    def __setupBrowserDriver(self, driver_type):
         if driver_type == 'Chrome':
             op = webdriver.ChromeOptions()
             # 這樣可以不用打開實際的瀏覽器 https://stackoverflow.com/questions/7593611/selenium-testing-without-browser
@@ -52,11 +52,11 @@ class WebDriverClient:
             return webdriver.Chrome()
 
     def getHtml(self, url, action_chains=None):
-        self._browser_driver.get(url)
+        self.__browser_driver.get(url)
         action_chains = self.obtainAction4BottomLoad()
         if action_chains != None:
             action_chains.perform()
-        page_data = self._browser_driver.page_source
+        page_data = self.__browser_driver.page_source
         parsed_data = bs4.BeautifulSoup(page_data, "lxml")
         return parsed_data
 
