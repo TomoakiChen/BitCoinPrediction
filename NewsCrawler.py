@@ -45,15 +45,6 @@ class LTNNewsClient(HtmlClient):
         news_element_list = html_parsed_data.find(class_='searchlist').findAll('li') #新聞(標題)清單
         for news_element in news_element_list:
             news_info = NewsInfo()
-            """
-            links = news.findAll('a')
-            #print(links)
-
-            #print(links[1].href).setTitle()),
-            news_info.setLink(links[1]['href']) #新聞連結
-            news_info.setTitle(links[1].find('h3').getText()) #新聞標題
-            # print(news_info)
-            """
             tag_link_element = news_element.find("a", class_="immtag")
             pub_datetime_element = news_element.findNext('span')
             str_pub_datetime = pub_datetime_element.getText()
