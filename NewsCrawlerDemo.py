@@ -1,6 +1,16 @@
-from NewsCrawler import LTNNewsClient, YahooNewsClient, cnYESNewsClient, MoneyUdnNewsClient
+from NewsCrawler import LTNNewsClient, YahooNewsClient, cnYESNewsClient, MoneyUdnNewsClient, NewsCrawler
 from datetime import datetime, date
 
+start = datetime.now()
+crawler = NewsCrawler()
+since_date = date.fromisoformat('2021-10-01')
+news_list = crawler.findBySinceDate(since_date)
+end = datetime.now()
+
+for news in news_list:
+    print(news)
+print("total nums = ", len(news_list))
+print("cost = ", (end - start))
 # --------------------------------- 以下是 自由時報格式 ---------------------------------
 """
 start = datetime.now()
@@ -57,6 +67,7 @@ print("cost = ", (end - start))
 
 
 # --------------------------------- 以下是 經濟日報 ---------------------------------
+"""
 start = datetime.now()
 money_udn_news_client = MoneyUdnNewsClient(headless=True)
 
@@ -71,4 +82,5 @@ for news in news_list:
     print(news)
 print("total nums = ", len(news_list))
 print("cost = ", (end - start))
+"""
 # --------------------------------- 以上是 經濟日報 ---------------------------------

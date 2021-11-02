@@ -304,3 +304,25 @@ class MoneyUdnNewsClient(WebDriverClient):
         news_info.setLink(link_url)
         # news_info.setPubDateTime(pub_datetime)
         return news_info
+
+class NewsCrawler:
+
+    __client_dic = {"LTN": LTNNewsClient(), "cnYES": cnYESNewsClient(headless=True), "MoneyUdn": MoneyUdnNewsClient(headless=True)}
+
+    def __init__(self, news_sources=["LTN", "cnYES"]):
+        self.__client_list = []
+        self.__setupClientList(news_sources)
+
+    def __setupClientList(self, news_sources):
+        for news_code in news_sources:
+            client = self.__client_dic.get(news_code)
+            if client != None:
+                self.__client_list.append(client)
+
+    def findBySinceDate(self, since_date):
+        all_news_info_list = []
+        for client in self.__client_list:
+            print("client = ", client)
+            news_info_list = client.findBySinceDate(since_date)
+            all_news_info_list.extend(news_info_list)
+        return all_news_info_list
