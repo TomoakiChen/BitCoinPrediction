@@ -3,6 +3,10 @@
 from datetime import datetime, date
 from PyWeb import HtmlClient, WebDriverClient
 from NewsInfo import NewsInfo
+from selenium.webdriver.common.by import By
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+
 
 
 class LTNNewsClient(HtmlClient):
@@ -10,7 +14,7 @@ class LTNNewsClient(HtmlClient):
     def __init__(self):
         super().__init__()
         self.__url_pattern = 'https://news.ltn.com.tw/topic/%E6%AF%94%E7%89%B9%E5%B9%A3/${PAGE}'
-        self.__news_since = None # news_since
+        # self.__news_since = None # news_since
         self.__news_until = None # news_until
 
         self.__now_url = None
@@ -18,6 +22,9 @@ class LTNNewsClient(HtmlClient):
         self.__pub_datetime_formats = ['%Y/%m/%d %H:%M', '%Y/%m/%d']
 
     def findByMaxPages(self, max_pages=10):
+        # 如果 __init__ 沒有，下面嘗試設定，這樣不行
+        self.__now_url = None
+        self.__now_page = 1
         news_info_list = []
         while self.__now_page <= max_pages:
             part_news_info_list = self.__miningOnePage()
@@ -48,11 +55,11 @@ class LTNNewsClient(HtmlClient):
                 break;
         return news_info_list
 
-    def findByInterval(self):
+    def findByInterval(self,):
         pass
 
 
-    def _doSetupNowUrl(self):
+    def __doSetupNowUrl(self):
         self.__now_url = self.__url_pattern.replace('${PAGE}', str(self.__now_page) )
         #print(self._now_url)
         self.__now_page += 1
@@ -61,28 +68,18 @@ class LTNNewsClient(HtmlClient):
         part_news_info_list = []
 
         # start1_1 = datetime.now()
-        self._doSetupNowUrl()
-        html_parsed_data = self.getHtml(self.__now_url)
+        self.__doSetupNowUrl()
+        html_parsed_data = self.getHtml(self.__now_url) #目前花時最多的
         # end1_1 = datetime.now()
         # print("cost1_1 = ", (end1_1 - start1_1))
 
-        # data-desc='新聞列表' > class='searchlist' > li
         # start1_2 = datetime.now()
+        # data-desc='新聞列表' > class='searchlist' > li
         news_element_list = html_parsed_data.find(class_='searchlist').findAll('li') #新聞(標題)清單
         for news_element in news_element_list:
-            news_info = NewsInfo()
-            tag_link_element = news_element.find("a", class_="immtag")
-            pub_datetime_element = news_element.findNext('span')
-            str_pub_datetime = pub_datetime_element.getText()
-            #news_info.setPubDateTime(datetime.strptime(str_pub_datetime, self._pub_datetime_format))
-            news_info.setPubDateTime(self.__obtainPubDateTime(str_pub_datetime))
-
-            title_link_element = news_element.find("a", class_="tit")
-            news_info.setLink(title_link_element['href']) #新聞連結
-            news_info.setTitle(title_link_element.find('h3').getText()) #新聞標題
-
+            news_info = self.__obtainNewsInfo(news_element)
             part_news_info_list.append(news_info)
-        end1_2 = datetime.now()
+        # end1_2 = datetime.now()
         # print("cost1_2 = ", (end1_2 - start1_2))
         return part_news_info_list
 
@@ -92,60 +89,67 @@ class LTNNewsClient(HtmlClient):
                 return datetime.strptime(str_pub_datetime, pub_datetime_format)
             except ValueError:
                 pass # Do Nothing
-
         return None
+
+    def __obtainNewsInfo(self, news_element):
+        news_info = NewsInfo()
+        tag_link_element = news_element.find("a", class_="immtag")
+        pub_datetime_element = news_element.findNext('span')
+        str_pub_datetime = pub_datetime_element.getText()
+        #news_info.setPubDateTime(datetime.strptime(str_pub_datetime, self._pub_datetime_format))
+        news_info.setPubDateTime(self.__obtainPubDateTime(str_pub_datetime))
+
+        title_link_element = news_element.find("a", class_="tit")
+        news_info.setLink(title_link_element['href']) #新聞連結
+        news_info.setTitle(title_link_element.find('h3').getText()) #新聞標題
+
+        return news_info
 
 class YahooNewsClient(WebDriverClient):
 
-    def __init__(self, url='https://tw.news.yahoo.com/tag/比特幣'):
-        super().__init__()
+    def __init__(self, url='https://tw.news.yahoo.com/tag/比特幣', headless=False):
+        super().__init__(headless=headless)
         self.__url = url
 
-    def getNewsInfoList(self, new_amount):
+        self.__now_page = 0
+
+    def findByMaxPages(self, max_pages=10):
+        self.__doReadyLoadPage()
         news_info_list = []
-        while self.__now_page <= self.__max_pages:
-            news_info_list = self._miningOnePage(news_info_list)
+        while self.__now_page <= max_pages:
+            #news_info_list = self.__miningOnePage(news_info_list)
+            news_info_list = self.__miningOnePage()
         return news_info_list
 
+    def __doReadyLoadPage(self):
+        self._browser_driver.get(self.__url)
+        container_element = self._browser_driver.find_element(By.TAG_NAME, 'body')
+        actions = webdriver.ActionChains(self._browser_driver)
+        actions.click(container_element)
+        actions.perform()
 
-    #def _doMiningOnePage(self):
-    def __miningOnePage(self, news_info_list):
-        start1_1 = datetime.now()
-        self.__doSetupNowUrl()
-        html_parsed_data = self.getHtml(self.__now_url)
-        end1_1 = datetime.now()
-        print("cost1_1 = ", (end1_1 - start1_1))
+    def __miningOnePage(self):
+        actions = webdriver.ActionChains(self._browser_driver)
+        actions.key_down(Keys.END)
+        actions.pause(5)
+        # actions.perform()
+        parsed_data = self.getHtml(self.__url, action_chains=actions)
+        #print("parsed_data=", parsed_data)
+        self.__now_page += 1
 
-        # data-desc='新聞列表' > class='searchlist' > li
-        start1_2 = datetime.now()
-        news_list = html_parsed_data.find(class_='searchlist').findAll('li') #新聞(標題)清單
-        for news in news_list:
-            news_info = NewsInfo()
-            links = news.findAll('a')
-            #print(links)
-
-            #print(links[1].href).setTitle())
-            news_info.setLink(links[1]['href']) #新聞連結
-            news_info.setTitle(links[1].find('h3').getText()) #新聞標題
-            # print(news_info)
-
+        news_info_list = []
+        news_element_list = parsed_data.findAll(class_='StreamMegaItem')
+        for news_element in news_element_list:
+            news_info = self.__obtainNewsInfo(news_element)
             news_info_list.append(news_info)
-        end1_2 = datetime.now()
-        print("cost1_2 = ", (end1_2 - start1_2))
-
         return news_info_list
 
+    def __obtainNewsInfo(self, news_element):
+        news_info = NewsInfo()
+        link_element = news_element.find("a", class_="mega-item-header-link")
+        link_url = link_element['href']
+        text = link_element.getText() #此method會忽略掉 註解和tag
 
-# --------------------------------- 以下是 自由時報格式 ---------------------------------
-ltn_client = LTNNewsClient()
-
-#ltn_news_list = ltn_client.findByMaxPages()
-since_date = date.fromisoformat('2021-01-01')
-ltn_news_list = ltn_client.findBySinceDate(since_date)
-
-#print(ltn_news_list)
-for ltn_news in ltn_news_list:
-    print(ltn_news)
-print("total nums = ", len(ltn_news_list))
-
-# --------------------------------- 以上是 自由時報格式 ---------------------------------
+        news_info.setTitle(text)
+        news_info.setLink(link_url)
+        return news_info

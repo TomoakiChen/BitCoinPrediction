@@ -37,14 +37,16 @@ class HtmlClient:
 # ============================================================================================================================================
 class WebDriverClient:
     # _auto_load_website_actions_ =
-    def __init__(self, driver_type='Chrome'):
-        self.__browser_driver = self.__setupBrowserDriver(driver_type)
+    def __init__(self, driver_type='Chrome', headless=False):
+        #print("driver_type= ", driver_type, ",headless= ", headless)
+        self._browser_driver = self.__setupBrowserDriver(driver_type, headless)
 
-    def __setupBrowserDriver(self, driver_type):
+    def __setupBrowserDriver(self, driver_type, headless):
         if driver_type == 'Chrome':
             op = webdriver.ChromeOptions()
-            # 這樣可以不用打開實際的瀏覽器 https://stackoverflow.com/questions/7593611/selenium-testing-without-browser
-            op.add_argument('headless')
+            if headless:
+                # 這樣可以不用打開實際的瀏覽器 https://stackoverflow.com/questions/7593611/selenium-testing-without-browser
+                op.add_argument('headless')
             return webdriver.Chrome(options=op)
         elif driver_type == 'Firefox':
             return webdriver.Firefox()
@@ -52,17 +54,16 @@ class WebDriverClient:
             return webdriver.Chrome()
 
     def getHtml(self, url, action_chains=None):
-        self.__browser_driver.get(url)
-        action_chains = self.obtainAction4BottomLoad()
+        # self._browser_driver.get(url)
         if action_chains != None:
             action_chains.perform()
-        page_data = self.__browser_driver.page_source
+        page_data = self._browser_driver.page_source
         parsed_data = bs4.BeautifulSoup(page_data, "lxml")
         return parsed_data
 
     """
     # 目前難以寫成一種方便使用的底層 method，此專案中先在 YahooNewsClient
-    # 中自行處理
+    # 中自行處理webdriver
     def obtainAction4BottomLoad(self):
         container_element = self._browser_driver.find_element(By.TAG_NAME, 'body')
         actions = webdriver.ActionChains(self._browser_driver)
