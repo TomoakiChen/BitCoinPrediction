@@ -40,7 +40,11 @@ print("cost = ", (end - start))
 start = datetime.now()
 cnYES_news_client = cnYESNewsClient(headless=True)
 
-news_list = cnYES_news_client.findByMaxPages(max_pages=10)
+# news_list = cnYES_news_client.findByMaxPages(max_pages=10)
+
+since_date = date.fromisoformat('2021-10-01')
+news_list = cnYES_news_client.findBySinceDate(since_date=since_date)
+
 end = datetime.now()
 
 for news in news_list:
@@ -56,7 +60,11 @@ print("cost = ", (end - start))
 start = datetime.now()
 money_udn_news_client = MoneyUdnNewsClient(headless=True)
 
-news_list = money_udn_news_client.findByMaxPages(max_pages=10)
+# news_list = money_udn_news_client.findByMaxPages(max_pages=10)
+
+since_date = date.fromisoformat('2021-10-01')
+news_list = money_udn_news_client.findBySinceDate(since_date=since_date)
+
 end = datetime.now()
 
 for news in news_list:

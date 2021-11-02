@@ -12,8 +12,13 @@ class NewsInfoHelper:
     @staticmethod
     def filterBySincaDate(ori_news_info_list, since_date):
         since_datetime = datetime.combine(since_date, datetime.min.time())
-        filtered_news_info_list = [news_info for news_info in ori_news_info_list if news_info.getPubDateTime() >= since_datetime]
+        filtered_news_info_list = [news_info for news_info in ori_news_info_list if news_info.getPubDateTime().timestamp() >= since_datetime.timestamp()]
         return filtered_news_info_list
+
+class NewsCrawlerHelper:
+    @staticmethod
+    def needStopMining(news_info_list, filtered_news_info_list):
+        return len(filtered_news_info_list) != len(news_info_list)
 
 class LTNNewsClient(HtmlClient):
 
@@ -165,7 +170,6 @@ class cnYESNewsClient(WebDriverClient):
     def __init__(self, url='https://www.cnyes.com/search/news?keyword=比特幣', headless=False):
         super().__init__(headless=headless)
         self.__url = url
-
         self.__now_page = 0
 
     def findByMaxPages(self, max_pages=10):
@@ -180,8 +184,12 @@ class cnYESNewsClient(WebDriverClient):
         self.__doReadyLoadPage()
         news_info_list = []
         while True:
-            news_info_list = self.__miningOnePage()
-            filtered_news_info_list = NewsInfoHelper.filterBySincaDate(news_info_list, since_date)
+            ori_news_info_list = self.__miningOnePage()
+            filtered_news_info_list = NewsInfoHelper.filterBySincaDate(ori_news_info_list, since_date)
+            news_info_list = filtered_news_info_list
+            if NewsCrawlerHelper.needStopMining(ori_news_info_list, filtered_news_info_list):
+                break
+        return news_info_list
 
     def __doReadyLoadPage(self):
         self._browser_driver.get(self.__url)
@@ -248,8 +256,12 @@ class MoneyUdnNewsClient(WebDriverClient):
         self.__doReadyLoadPage()
         news_info_list = []
         while True:
-            news_info_list = self.__miningOnePage()
-            filtered_news_info_list = NewsInfoHelper.filterBySincaDate(news_info_list, since_date)
+            ori_news_info_list = self.__miningOnePage()
+            filtered_news_info_list = NewsInfoHelper.filterBySincaDate(ori_news_info_list, since_date)
+            news_info_list = filtered_news_info_list
+            if NewsCrawlerHelper.needStopMining(ori_news_info_list, filtered_news_info_list):
+                break
+        return news_info_list
 
     def __doReadyLoadPage(self):
         self._browser_driver.get(self.__url)
