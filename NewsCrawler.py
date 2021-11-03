@@ -118,7 +118,7 @@ class LTNNewsClient(HtmlClient):
 
 class YahooNewsClient(WebDriverClient):
 
-    def __init__(self, url='https://tw.news.yahoo.com/tag/比特幣', headless=False):
+    def __init__(self, url='https://tw.news.yahoo.com/tag/比特幣', headless=True):
         super().__init__(headless=headless)
         self.__url = url
 
@@ -167,7 +167,7 @@ class YahooNewsClient(WebDriverClient):
 
 class cnYESNewsClient(WebDriverClient):
 
-    def __init__(self, url='https://www.cnyes.com/search/news?keyword=比特幣', headless=False):
+    def __init__(self, url='https://www.cnyes.com/search/news?keyword=比特幣', headless=True):
         super().__init__(headless=headless)
         self.__url = url
         self.__now_page = 0
@@ -238,7 +238,7 @@ class cnYESNewsClient(WebDriverClient):
 """
 class MoneyUdnNewsClient(WebDriverClient):
 
-    def __init__(self, url='https://money.udn.com/search/result/1001/比特幣', headless=False):
+    def __init__(self, url='https://money.udn.com/search/result/1001/比特幣', headless=True):
         super().__init__(headless=headless)
         self.__url = url
 
@@ -402,10 +402,10 @@ class NewsCrawler:
       "Yahoo": YahooNewsClient(headless=True),
       "cnYES": cnYESNewsClient(headless=True),
       "MoneyUdn": MoneyUdnNewsClient(headless=True),
-      "Bitcoin.Com": BitCoinComNewsClient()
-    }    
+      "Bitcoin.com": BitCoinComNewsClient()
+    }
 
-    def __init__(self, news_sources=["LTN", "cnYES", "Bitcoin.Com"]):
+    def __init__(self, news_sources=["LTN", "cnYES", "Bitcoin.com"]):
         self.__client_list = []
         self.__setupClientList(news_sources)
 
