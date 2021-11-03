@@ -9,7 +9,7 @@
     ```shell
      pip install selenium
     ```
-* 需下載 Web Driver，如專案內的 chromedriver.exe
+需下載 Web Driver，如專案內的 chromedriver.exe
 
 ### 目前支援的新聞網站
 |新聞網站| 代碼 |獨立Client Class|備註|
