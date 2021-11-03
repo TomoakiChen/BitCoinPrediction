@@ -305,11 +305,107 @@ class MoneyUdnNewsClient(WebDriverClient):
         # news_info.setPubDateTime(pub_datetime)
         return news_info
 
+class BitCoinComNewsClient(HtmlClient):
+    def __init__(self):
+        super().__init__()
+        self.__url_pattern = 'https://news.bitcoin.com/page/${PAGE}/?s=Bitcoin'
+        # self.__news_since = None # news_since
+        self.__news_until = None # news_until
+
+        self.__now_url = None
+        self.__now_page = 1
+        #self.__pub_datetime_formats = ['%Y/%m/%d %H:%M', '%Y/%m/%d']
+        # 直接用 isoformat
+
+    def findByMaxPages(self, max_pages=10):
+        # 如果 __init__ 沒有，下面嘗試設定，這樣不行
+        self.__now_url = None
+        self.__now_page = 1
+        news_info_list = []
+        while self.__now_page <= max_pages:
+            part_news_info_list = self.__miningOnePage()
+            news_info_list.extend(part_news_info_list)
+        return news_info_list
+
+    def findBySinceDate(self, since_date = date.today()):
+        news_info_list = []
+        since_datetime = datetime.combine(since_date, datetime.min.time())
+        while True:
+            part_news_info_list = self.__miningOnePage()
+            filtered_part_news_info_list = NewsInfoHelper.filterBySincaDate(part_news_info_list, since_date)
+            news_info_list.extend(filtered_part_news_info_list)
+            if len(filtered_part_news_info_list) != len(part_news_info_list):
+                break;
+        return news_info_list
+
+    def findByInterval(self):
+        pass
+
+
+    def __doSetupNowUrl(self):
+        self.__now_url = self.__url_pattern.replace('${PAGE}', str(self.__now_page) )
+        #print(self._now_url)
+        self.__now_page += 1
+
+    def __miningOnePage(self):
+        part_news_info_list = []
+
+        self.__doSetupNowUrl()
+        html_parsed_data = self.getHtml(self.__now_url) #目前花時最多的
+
+        # data-desc='新聞列表' > class='searchlist' > li
+        news_element_list = html_parsed_data.find("div", class_='td-main-content').findAll(class_='td-animation-stack') #新聞(標題)清單
+        for news_element in news_element_list:
+            news_info = self.__obtainNewsInfo(news_element)
+            part_news_info_list.append(news_info)
+        return part_news_info_list
+
+    def __obtainPubDateTime(self, str_pub_datetime):
+        for pub_datetime_format in self.__pub_datetime_formats:
+            try:
+                return datetime.strptime(str_pub_datetime, pub_datetime_format)
+            except ValueError:
+                pass # Do Nothing
+        return None
+
+    def __obtainNewsInfo(self, news_element):
+        news_info = NewsInfo()
+        items_detail_element = news_element.find(class_="item-details")
+
+        title_element = items_detail_element.find(class_="entry-title")
+        link_element = title_element.find("a")
+        link_url = link_element["href"]
+        title = link_element.getText()
+
+        meta_info_element = items_detail_element.find(class_="td-module-meta-info")
+        datetime_eleent = meta_info_element.find("time", class_="entry-date")
+        str_pub_datetime = datetime_eleent["datetime"]
+        pub_datetime = datetime.fromisoformat(str_pub_datetime)
+
+        news_info.setTitle(title)
+        news_info.setLink(link_url)
+        news_info.setPubDateTime(pub_datetime)
+        return news_info
+
 class NewsCrawler:
+    """
+    __client_dic = {
+      "LTN": LTNNewsClient(),
+      "Yahoo": YahooNewsClient(headless=True),
+      "cnYES": cnYESNewsClient(headless=True),
+      "MoneyUdn": MoneyUdnNewsClient(headless=True),
+      "Bitcoin.Com": BitCoinComNewsClient()
+    }
+    """
+    __client_dic = {
+      "LTN": LTNNewsClient(),
+      "Yahoo": YahooNewsClient(headless=True),
+      "cnYES": cnYESNewsClient(headless=True),
+      "MoneyUdn": MoneyUdnNewsClient(headless=True),
+      "Bitcoin.Com": BitCoinComNewsClient()
+    }    
 
-    __client_dic = {"LTN": LTNNewsClient(), "cnYES": cnYESNewsClient(headless=True), "MoneyUdn": MoneyUdnNewsClient(headless=True)}
-
-    def __init__(self, news_sources=["LTN", "cnYES"]):
+    def __init__(self, news_sources=["LTN", "cnYES", "Bitcoin.Com"]):
         self.__client_list = []
         self.__setupClientList(news_sources)
 
@@ -322,7 +418,6 @@ class NewsCrawler:
     def findBySinceDate(self, since_date):
         all_news_info_list = []
         for client in self.__client_list:
-            print("client = ", client)
             news_info_list = client.findBySinceDate(since_date)
             all_news_info_list.extend(news_info_list)
         return all_news_info_list

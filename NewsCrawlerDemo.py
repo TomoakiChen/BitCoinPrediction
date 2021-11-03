@@ -1,5 +1,6 @@
-from NewsCrawler import LTNNewsClient, YahooNewsClient, cnYESNewsClient, MoneyUdnNewsClient, NewsCrawler
+from NewsCrawler import LTNNewsClient, YahooNewsClient, cnYESNewsClient, MoneyUdnNewsClient, NewsCrawler, BitCoinComNewsClient
 from datetime import datetime, date
+
 
 start = datetime.now()
 crawler = NewsCrawler()
@@ -84,3 +85,23 @@ print("total nums = ", len(news_list))
 print("cost = ", (end - start))
 """
 # --------------------------------- 以上是 經濟日報 ---------------------------------
+
+
+# --------------------------------- 以下是 Bitcoin.com ---------------------------------
+"""
+start = datetime.now()
+bitconin_com_client = BitCoinComNewsClient()
+
+# news_list = bitconin_com_client.findByMaxPages(max_pages=1)
+
+since_date = date.fromisoformat('2021-10-01')
+news_list = bitconin_com_client.findBySinceDate(since_date)
+end = datetime.now()
+
+#print(ltn_news_list)
+for news in news_list:
+    print(news)
+print("total nums = ", len(news_list))
+print("cost = ", (end - start))
+"""
+# --------------------------------- 以上是 Bitcoin.com ---------------------------------
