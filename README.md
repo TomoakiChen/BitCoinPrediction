@@ -4,17 +4,17 @@
 ## 消息面資料
 ### 新聞爬蟲
 #### 所需準備
-##### Python Dependency
-* 標準函示庫
-  * datatime
-  * urllib
+* Python Dependency
+  * 標準函示庫
+    * datatime
+    * urllib
 
-* 需另外安裝函示庫
-  * selenium
-    ```shell
-     pip install selenium
-    ```
-需下載 Web Driver，如專案內的 chromedriver.exe
+  * 需另外安裝函示庫
+    * selenium
+      ```shell
+      pip install selenium
+      ```
+* 需下載 Web Driver，如專案內的 chromedriver.exe
 
 #### 目前支援的新聞網站
 |新聞網站| 代碼 |獨立Client Class|備註|
