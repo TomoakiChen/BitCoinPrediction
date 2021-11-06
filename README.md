@@ -33,36 +33,35 @@
     * findBySinceDate(since_date)：
       參數：
       * since_date：**預設為今日**，爬蟲將會爬此日期之後的所有新聞
+        ```Python
+        # 要搜尋那些站，此例子會查詢 Bitcoin.com 、自由時報這幾個網站
+        crawler = NewsCrawler(news_sources=["LTN", "Bitcoin.com"])
 
-      ```Python
-      # 要搜尋那些站，此例子會查詢 Bitcoin.com 、自由時報這幾個網站
-      crawler = NewsCrawler(news_sources=["LTN", "Bitcoin.com"])
-
-      # 搜尋所有 2021-10-01 之後的新聞
-      since_date = date.fromisoformat('2021-10-01')
-      news_list = crawler.findBySinceDate(since_date)
-      ```
+        # 搜尋所有 2021-10-01 之後的新聞
+        since_date = date.fromisoformat('2021-10-01')
+        news_list = crawler.findBySinceDate(since_date)
+        ```
 
   * 單一網站 - 以自由時報資料為例，基本上所有Client都有相關 method：
     * findBySinceDate(since_date)
       參數：
 
       * since_date：爬蟲將會爬此日期之後的所有新聞，**預設為今日**，即今日的所有新聞。
-      ```Python
-      # 搜尋所有 2021-10-01 之後的新聞
-       ltn_news_client = LTNNewsClient()
-       since_date = date.fromisoformat('2021-10-01')
-       news_list = ltn_news_client.findBySinceDate(since_date)
-      ```
+        ```Python
+        # 搜尋所有 2021-10-01 之後的新聞
+         ltn_news_client = LTNNewsClient()
+         since_date = date.fromisoformat('2021-10-01')
+         news_list = ltn_news_client.findBySinceDate(since_date)
+        ```
     * findByMaxPages(max_pages=10)
       參數：
 
       * max_pages：要爬該網站幾頁，**預設為10頁**。
-      ```Python
-      # 搜尋 5頁 的新聞
-       ltn_news_client = LTNNewsClient()
-       news_list = ltn_news_client.findByMaxPages(max_pages=5)
-      ```
+        ```Python
+        # 搜尋 5頁 的新聞
+         ltn_news_client = LTNNewsClient()
+         news_list = ltn_news_client.findByMaxPages(max_pages=5)
+        ```
 
   * #### 回傳的資料格式
     ```json
