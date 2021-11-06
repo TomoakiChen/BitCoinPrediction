@@ -16,13 +16,13 @@
     * 需下載 Web Driver，如專案內的 chromedriver.exe
 
 * #### 目前支援的新聞網站
-|新聞網站| 代碼 |獨立Client Class|備註|
-|--------|-----|----------|---------|
-|自由時報 |LTN|LTNNewsClient||
-|Yahoo新聞|Yahoo|YahooNewsClient|目前不支援 getBySinceDate()|
-|鉅亨網|cnYES|cnYESNewsClient||
-|經濟日報|MoneyUdn|MoneyUdnNewsClient||
-|Bitcoin.com|Bitcoin.com|BitCoinComNewsClient||
+  * |新聞網站| 代碼 |獨立Client Class|備註|
+    |--------|-----|----------|---------|
+    |自由時報 |LTN|LTNNewsClient||
+    |Yahoo新聞|Yahoo|YahooNewsClient|目前不支援 getBySinceDate()|
+    |鉅亨網|cnYES|cnYESNewsClient||
+    |經濟日報|MoneyUdn|MoneyUdnNewsClient||
+    |Bitcoin.com|Bitcoin.com|BitCoinComNewsClient||
 
 
 
