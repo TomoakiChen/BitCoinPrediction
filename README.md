@@ -1,10 +1,10 @@
 # 市場面資料
 ## GlassNode
 
-# 消息面資料
-## 新聞爬蟲
-### 所需準備
-#### Python Dependency
+## 消息面資料
+### 新聞爬蟲
+#### 所需準備
+##### Python Dependency
 * 標準函示庫
   * datatime
   * urllib
@@ -16,7 +16,7 @@
     ```
 需下載 Web Driver，如專案內的 chromedriver.exe
 
-### 目前支援的新聞網站
+#### 目前支援的新聞網站
 |新聞網站| 代碼 |獨立Client Class|備註|
 |--------|-----|----------|---------|
 |自由時報 |LTN|LTNNewsClient||
@@ -27,7 +27,7 @@
 
 
 
-### 使用方式：
+#### 使用方式：
 * 一次爬很多網站 - NewsCrawler
   * 初始化參數：
     * news_sources ：網站代碼，即「目前支援的新聞網站」中的代碼。
@@ -65,7 +65,7 @@
      news_list = ltn_news_client.findByMaxPages(max_pages=5)
     ```
 
-### 回傳的資料格式
+#### 回傳的資料格式
 ```json
   [
     {
