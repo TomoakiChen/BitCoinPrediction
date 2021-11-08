@@ -387,6 +387,13 @@ class BitCoinComNewsClient(HtmlClient):
         news_info.setPubDateTime(pub_datetime)
         return news_info
 
+class CNBCNewsClient(WebDriverClient):
+
+    def __init__(self, url='https://www.cnbc.com/search/?query=Bitcoin&qsearchterm=Bitcoin', headless=True):
+        super().__init__(headless=headless)
+        self.__url = url
+        self.__now_page = 0
+
 class NewsCrawler:
     """
     __client_dic = {
