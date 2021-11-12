@@ -31,19 +31,22 @@ print(df)
 """
 
 """
-data_closed_price_list = client.getDailyClosedPriceList()
+data_closed_price_list = client.getDailyClosedPriceNumpy()
 print(data_closed_price_list)
 """
 
 """"
-daily_price_changed_info_list = client.getDailyClosedPriceChangeList()
+daily_price_changed_info_list = client.getDailyClosedPriceChangeNumpy()
 print(daily_price_changed_info_list[:])
 """
 
+
 """
-hourly_price_info_list = client.getHourlyClosedPriceList()
+hourly_price_info_list = client.getHourlyClosedPriceNumpy()
 print(hourly_price_info_list)
 """
 
-hourly_price_changed_info_list = client.getHourlyClosedPriceChangeList()
+"""
+hourly_price_changed_info_list = client.getHourlyClosedPriceChangeNumpy()
 print(hourly_price_changed_info_list)
+"""

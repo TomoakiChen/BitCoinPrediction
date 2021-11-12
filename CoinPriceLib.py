@@ -3,6 +3,7 @@ from datetime import date as DateUtils
 from datetime import datetime as DateTimeUtils
 # df = pd.read_csv('https://www.cryptodatadownload.com/cdd/Binance_BTCUSDT_d.csv')
 # print(df[0])
+import urllib
 
 
 class CryptoDatadownloadBinaceClient:
@@ -16,17 +17,40 @@ class CryptoDatadownloadBinaceClient:
     def __init__(self):
         pass
 
+    def _readCsv(self, url):
+        try:
+            df = pd.read_csv(url, header=1)
+        except urllib.error.URLError:
+            # 有遇到一般的 urllib.request 不會說SSL問題，但是 pandas使用的方法(底也是urllib)報錯。
+            import ssl
+            ssl._create_default_https_context = ssl._create_unverified_context
+            df = pd.read_csv(url, header=1)
+        df = self._processingDataFrame(df)
+        return df
+
+    def _processingDataFrame(self, df):
+        df = self._processingDateInfo(df)
+
+        return df
+
+    def _processingDateInfo(self, df):
+        date_datas = []
+        for date_data in df["date"]:
+            date_datas.append(CryptoDatadownloadBinaceCsvDataParser.parseDateInfo(date_data))
+        df["date"] = date_datas
+        return df
     # ==================================================== 以下是 csv初始的 DataFrame 格式 ====================================================
     def getDailyDataFrame(self, desig_col_list=None):
         # 第一行是 CryptoDatadownload 的標註
-        df = pd.read_csv(self.__url_dict.get('Daily'), header=1)
+        # df = pd.read_csv(self.__url_dict.get('Daily'), header=1)
+        df = self._readCsv(self.__url_dict.get('Daily'))
         if desig_col_list == None:
             return df
         else:
             return df[desig_col_list]
 
     def getHourlyDataFrame(self, desig_col_list=None):
-        df = pd.read_csv(self.__url_dict.get('Hourly'), header=1)
+        df = self._readCsv(self.__url_dict.get('Hourly'))
         if desig_col_list == None:
             return df
         else:
@@ -40,8 +64,10 @@ class CryptoDatadownloadBinaceClient:
         for daily_closed_price in daily_closed_price_list:
             daily_closed_price_info = []
 
-            str_date = daily_closed_price[0].replace(' 00:00:00', '')
-            date = DateUtils.fromisoformat(str_date)
+            # 2021-11-12 1228 ，_processingDateInfo 處理掉了
+            # str_date = daily_closed_price[0].replace(' 00:00:00', '')
+            # date = DateUtils.fromisoformat(str_date)
+            date = daily_closed_price[0]
 
             price = daily_closed_price[1]
             # print("date= ", str_date, ", price= ", str_price)
@@ -54,7 +80,7 @@ class CryptoDatadownloadBinaceClient:
 
     def getDailyClosedPriceChangNumpy(self):
         daily_closed_price_change_info_list = []
-        daily_closed_price_info_list = self.getDailyClosedPriceList()
+        daily_closed_price_info_list = self.getDailyClosedPriceNumpy()
         for index, daily_closed_price_info in enumerate(daily_closed_price_info_list):
             price_changed_rate = None
             today = daily_closed_price_info[0]
@@ -77,11 +103,13 @@ class CryptoDatadownloadBinaceClient:
         for hourly_closed_price in hourly_closed_price_list:
             hourly_closed_price_info = []
 
-            str_date_time = hourly_closed_price[0] # .strip()
-            if str_date_time.__contains__('AM') or str_date_time.__contains__('PM'):
-                date_time = DateTimeUtils.strptime(str_date_time, "%Y-%m-%d %I-%p")
-            else:
-                date_time = pd.to_datetime(str_date_time) # DateTimeUtils.strptime("%Y-%m-%d %H:%M:%S", str_date_time)
+            # 2021-11-12 1228 ，_processingDateInfo 處理掉了
+            # str_date_time = hourly_closed_price[0] # .strip()
+            # if str_date_time.__contains__('AM') or str_date_time.__contains__('PM'):
+            #    date_time = DateTimeUtils.strptime(str_date_time, "%Y-%m-%d %I-%p")
+            # else:
+            #    date_time = pd.to_datetime(str_date_time) # DateTimeUtils.strptime("%Y-%m-%d %H:%M:%S", str_date_time)
+            date_time = hourly_closed_price[0]
 
             price = hourly_closed_price[1]
             hourly_price_info = [date_time, price]
@@ -92,7 +120,7 @@ class CryptoDatadownloadBinaceClient:
 
     def getHourlyClosedPriceChangeNumpy(self):
         hourly_closed_price_change_info_list = []
-        hourly_closed_price_info_list = self.getHourlyClosedPriceList()
+        hourly_closed_price_info_list = self.getHourlyClosedPriceNumpy()
         for index, hourly_closed_price_info in enumerate(hourly_closed_price_info_list):
             price_changed_rate = None
             record_datetime = hourly_closed_price_info[0]
@@ -107,12 +135,19 @@ class CryptoDatadownloadBinaceClient:
         return hourly_closed_price_change_info_list
 
 # 要拆出來比較要想，先暫時留著不實作
-class CryptoDatadownloadBinaceCsvParser:
+class CryptoDatadownloadBinaceCsvDataParser:
 
     @staticmethod
     def parseCsv(df_csv):
         pass
 
+    @staticmethod
+    def parseDateInfo(str_date_time):
+        if str_date_time.__contains__('AM') or str_date_time.__contains__('PM'):
+            date_time = DateTimeUtils.strptime(str_date_time, "%Y-%m-%d %I-%p")
+        else:
+            date_time = pd.to_datetime(str_date_time) # DateTimeUtils.strptime("%Y-%m-%d %H:%M:%S", str_date_time)
+        return date_time
 
 class FinanceHelper:
 
