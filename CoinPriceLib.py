@@ -109,7 +109,7 @@ class CryptoDatadownloadBinaceClient:
         df = self.getHourlyDataFrame(["date", "close"])
         hourly_closed_price_list = df.to_numpy()
         for hourly_closed_price in hourly_closed_price_list:
-            hourly_closed_price_info = []
+            hourly_closed_price_info = []  
 
             # 2021-11-12 1228 ，_processingDateInfo 處理掉了
             # str_date_time = hourly_closed_price[0] # .strip()
