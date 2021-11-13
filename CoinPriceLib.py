@@ -68,6 +68,7 @@ class CryptoDatadownloadBinaceClient:
         daily_closed_price_info_list = []
 
         df = self.getDailyDataFrame(["date", "close"])
+        # 以下改用 parseCsv2ClosePriceInfo 轉換
         daily_closed_price_list = df.to_numpy()
         for daily_closed_price in daily_closed_price_list:
             daily_closed_price_info = []
@@ -80,6 +81,7 @@ class CryptoDatadownloadBinaceClient:
             daily_closed_price_info_list.append(daily_price_info)
 
         daily_closed_price_info_list.reverse()
+        # 以上改用 parseCsv2ClosePriceInfo 轉換
         return daily_closed_price_info_list
 
     def getDailyClosedPriceChangNumpy(self):
@@ -103,6 +105,7 @@ class CryptoDatadownloadBinaceClient:
         hourly_closed_price_info_list = []
 
         df = self.getHourlyDataFrame(["date", "close"])
+        # 以下改用 parseCsv2ClosePriceInfo 轉換
         hourly_closed_price_list = df.to_numpy()
         for hourly_closed_price in hourly_closed_price_list:
             hourly_closed_price_info = []
@@ -115,6 +118,7 @@ class CryptoDatadownloadBinaceClient:
             hourly_closed_price_info_list.append(hourly_price_info)
 
         hourly_closed_price_info_list.reverse()
+        # 以上改用 parseCsv2ClosePriceInfo 轉換        
         return hourly_closed_price_info_list
 
     def getHourlyClosedPriceChangeNumpy(self):
