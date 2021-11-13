@@ -55,6 +55,14 @@ class CryptoDatadownloadBinaceClient:
             return df
         else:
             return df[desig_col_list]
+
+    def getHourlyDataFrame4Test(self):
+        hourly_df = pd.DataFrame({
+            "date" : ["2021-11-12 13:00:00", "2021-11-12 12:00", "2021-11-11 07:00", "2021-10-01 08:00"],
+            "close" : [10000, 20000, 30000, 100]
+        })
+        hourly_df["date"] = CryptoDatadownloadBinaceCsvDataParser.parseDateInfo(hourly_df["date"])
+        return hourly_df
     # ==================================================== 以上是 csv初始的 DataFrame 格式 ====================================================
 
     def getDailyClosedPriceNumpy(self):
