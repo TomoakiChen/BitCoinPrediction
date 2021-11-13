@@ -65,23 +65,8 @@ class CryptoDatadownloadBinaceClient:
     # ==================================================== 以上是 csv初始的 DataFrame 格式 ====================================================
 
     def getDailyClosedPriceNumpy(self):
-        daily_closed_price_info_list = []
-
         df = self.getDailyDataFrame(["date", "close"])
-        # 以下改用 parseCsv2ClosePriceInfo 轉換
-        daily_closed_price_list = df.to_numpy()
-        for daily_closed_price in daily_closed_price_list:
-            daily_closed_price_info = []
-
-            date = daily_closed_price[0]
-
-            price = daily_closed_price[1]
-
-            daily_price_info = [date, price]
-            daily_closed_price_info_list.append(daily_price_info)
-
-        daily_closed_price_info_list.reverse()
-        # 以上改用 parseCsv2ClosePriceInfo 轉換
+        daily_closed_price_info_list = CryptoDatadownloadBinaceCsvDataParser.parseCsv2ClosePriceNumpy(df)
         return daily_closed_price_info_list
 
     def getDailyClosedPriceChangNumpy(self):
@@ -102,23 +87,8 @@ class CryptoDatadownloadBinaceClient:
 
 
     def getHourlyClosedPriceNumpy(self):
-        hourly_closed_price_info_list = []
-
         df = self.getHourlyDataFrame(["date", "close"])
-        # 以下改用 parseCsv2ClosePriceInfo 轉換
-        hourly_closed_price_list = df.to_numpy()
-        for hourly_closed_price in hourly_closed_price_list:
-            hourly_closed_price_info = []
-
-            date_time = hourly_closed_price[0]
-
-            price = hourly_closed_price[1]
-
-            hourly_price_info = [date_time, price]
-            hourly_closed_price_info_list.append(hourly_price_info)
-
-        hourly_closed_price_info_list.reverse()
-        # 以上改用 parseCsv2ClosePriceInfo 轉換        
+        hourly_closed_price_info_list = CryptoDatadownloadBinaceCsvDataParser.parseCsv2ClosePriceNumpy(df)
         return hourly_closed_price_info_list
 
     def getHourlyClosedPriceChangeNumpy(self):
@@ -137,11 +107,12 @@ class CryptoDatadownloadBinaceClient:
             hourly_closed_price_change_info_list.append(hourly_closed_price_change_info)
         return hourly_closed_price_change_info_list
 
-# 要拆出來比較要想，先暫時留著不實作
+
+# ========================================================= 以下 輔佐將 csv data 轉換 =========================================================
 class CryptoDatadownloadBinaceCsvDataParser:
 
     @staticmethod
-    def parseCsv2ClosePriceInfo(df):
+    def parseCsv2ClosePriceNumpy(df):
         periodly_closed_price_info_list = []
         periodly_closed_price_list = df.to_numpy()
         for periodly_closed_price in periodly_closed_price_list:
@@ -164,10 +135,13 @@ class CryptoDatadownloadBinaceCsvDataParser:
         else:
             date_time = pd.to_datetime(str_date_time) # DateTimeUtils.strptime("%Y-%m-%d %H:%M:%S", str_date_time)
         return date_time
+# ========================================================= 以上 輔佐將 csv data 轉換 =========================================================
 
 
+# ========================================================= 以下 一些財經相關的算式(?)的methods =========================================================
 class FinanceHelper:
 
     @staticmethod
     def countSampleReturn(now_price, pre_price):
         return (now_price - pre_price) / pre_price
+# ========================================================= 以上 一些財經相關的算式(?)的methods =========================================================
