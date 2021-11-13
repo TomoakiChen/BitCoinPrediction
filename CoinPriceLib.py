@@ -42,7 +42,6 @@ class CryptoDatadownloadBinaceClient:
     # ==================================================== 以下是 csv初始的 DataFrame 格式 ====================================================
     def getDailyDataFrame(self, desig_col_list=None):
         # 第一行是 CryptoDatadownload 的標註
-        # df = pd.read_csv(self.__url_dict.get('Daily'), header=1)
         df = self._readCsv(self.__url_dict.get('Daily'))
         if desig_col_list == None:
             return df
@@ -66,8 +65,9 @@ class CryptoDatadownloadBinaceClient:
     # ==================================================== 以上是 csv初始的 DataFrame 格式 ====================================================
 
     def getDailyClosedPriceNumpy(self):
-        df = self.getDailyDataFrame(["date", "close"])
         daily_closed_price_info_list = []
+
+        df = self.getDailyDataFrame(["date", "close"])
         daily_closed_price_list = df.to_numpy()
         for daily_closed_price in daily_closed_price_list:
             daily_closed_price_info = []
@@ -137,8 +137,21 @@ class CryptoDatadownloadBinaceClient:
 class CryptoDatadownloadBinaceCsvDataParser:
 
     @staticmethod
-    def parseCsv(df_csv):
-        pass
+    def parseCsv2ClosePriceInfo(df):
+        periodly_closed_price_info_list = []
+        periodly_closed_price_list = df.to_numpy()
+        for periodly_closed_price in periodly_closed_price_list:
+            periodly_closed_price_info = []
+
+            period_label = periodly_closed_price[0]
+
+            price = periodly_closed_price[1]
+
+            periodly_closed_price_info = [period_label, price]
+            periodly_closed_price_info_list.append(periodly_closed_price_info)
+
+        periodly_closed_price_info_list.reverse()
+        return periodly_closed_price_info_list
 
     @staticmethod
     def parseDateInfo(str_date_time):
@@ -147,6 +160,7 @@ class CryptoDatadownloadBinaceCsvDataParser:
         else:
             date_time = pd.to_datetime(str_date_time) # DateTimeUtils.strptime("%Y-%m-%d %H:%M:%S", str_date_time)
         return date_time
+
 
 class FinanceHelper:
 
