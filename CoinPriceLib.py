@@ -72,14 +72,10 @@ class CryptoDatadownloadBinaceClient:
         for daily_closed_price in daily_closed_price_list:
             daily_closed_price_info = []
 
-            # 2021-11-12 1228 ，_processingDateInfo 處理掉了
-            # str_date = daily_closed_price[0].replace(' 00:00:00', '')
-            # date = DateUtils.fromisoformat(str_date)
             date = daily_closed_price[0]
 
             price = daily_closed_price[1]
-            # print("date= ", str_date, ", price= ", str_price)
-            # print(type(str_date), ", ",type(price))
+
             daily_price_info = [date, price]
             daily_closed_price_info_list.append(daily_price_info)
 
@@ -109,17 +105,12 @@ class CryptoDatadownloadBinaceClient:
         df = self.getHourlyDataFrame(["date", "close"])
         hourly_closed_price_list = df.to_numpy()
         for hourly_closed_price in hourly_closed_price_list:
-            hourly_closed_price_info = []  
+            hourly_closed_price_info = []
 
-            # 2021-11-12 1228 ，_processingDateInfo 處理掉了
-            # str_date_time = hourly_closed_price[0] # .strip()
-            # if str_date_time.__contains__('AM') or str_date_time.__contains__('PM'):
-            #    date_time = DateTimeUtils.strptime(str_date_time, "%Y-%m-%d %I-%p")
-            # else:
-            #    date_time = pd.to_datetime(str_date_time) # DateTimeUtils.strptime("%Y-%m-%d %H:%M:%S", str_date_time)
             date_time = hourly_closed_price[0]
 
             price = hourly_closed_price[1]
+
             hourly_price_info = [date_time, price]
             hourly_closed_price_info_list.append(hourly_price_info)
 
