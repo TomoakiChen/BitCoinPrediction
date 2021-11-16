@@ -1,10 +1,9 @@
 import pandas as pd
+import urllib
 from datetime import date as DateUtils
 from datetime import datetime as DateTimeUtils
-# df = pd.read_csv('https://www.cryptodatadownload.com/cdd/Binance_BTCUSDT_d.csv')
-# print(df[0])
-import urllib
-
+from PandasHelper import PandasDataFrameHelper
+import numpy
 
 class CryptoDatadownloadBinaceClient:
 
@@ -64,12 +63,13 @@ class CryptoDatadownloadBinaceClient:
         return hourly_df
     # ==================================================== 以上是 csv初始的 DataFrame 格式 ====================================================
 
+    # ==================================================== 以下是 Numpy 格式 ====================================================
     def getDailyClosedPriceNumpy(self):
         df = self.getDailyDataFrame(["date", "close"])
-        daily_closed_price_info_list = CryptoDatadownloadBinaceCsvDataParser.parseCsv2ClosePriceNumpy(df)
+        daily_closed_price_info_list = CryptoDatadownloadBinaceCsvDataParser.parseCsv2PeriodlyClosedPriceNumpy(df)
         return daily_closed_price_info_list
 
-    def getDailyClosedPriceChangNumpy(self):
+    def getDailyClosedPriceChangeNumpy(self):
         daily_closed_price_change_info_list = []
         daily_closed_price_info_list = self.getDailyClosedPriceNumpy()
         for index, daily_closed_price_info in enumerate(daily_closed_price_info_list):
@@ -85,10 +85,13 @@ class CryptoDatadownloadBinaceClient:
             daily_closed_price_change_info_list.append(daily_closed_price_change_info)
         return daily_closed_price_change_info_list
 
+    def getDailyClosedPriceNumpy(self):
+        pass
+
 
     def getHourlyClosedPriceNumpy(self):
         df = self.getHourlyDataFrame(["date", "close"])
-        hourly_closed_price_info_list = CryptoDatadownloadBinaceCsvDataParser.parseCsv2ClosePriceNumpy(df)
+        hourly_closed_price_info_list = CryptoDatadownloadBinaceCsvDataParser.parseCsv2PeriodlyClosedPriceNumpy(df)
         return hourly_closed_price_info_list
 
     def getHourlyClosedPriceChangeNumpy(self):
@@ -106,27 +109,50 @@ class CryptoDatadownloadBinaceClient:
             hourly_closed_price_change_info = [record_datetime, price_changed_rate]
             hourly_closed_price_change_info_list.append(hourly_closed_price_change_info)
         return hourly_closed_price_change_info_list
+    # ==================================================== 以上是 Numpy 格式 ====================================================
 
 
 # ========================================================= 以下 輔佐將 csv data 轉換 =========================================================
 class CryptoDatadownloadBinaceCsvDataParser:
 
+    """
+    numpy 覺得就是該單欄資料(暫時限close資料狀況下)
+    """
     @staticmethod
-    def parseCsv2ClosePriceNumpy(df):
-        periodly_closed_price_info_list = []
+    def parseCsv2PeriodlyClosedPriceNumpy(df):
+        # periodly_closed_price_info_numpy = numpy.asarray([])
+        periodly_closed_price_info_numpy = numpy.empty(shape=2)
+        periodly_closed_price_list = df.to_numpy()
+        # print(type(periodly_closed_price_list))
+        for periodly_closed_price in periodly_closed_price_list:
+            period_label = periodly_closed_price[0]
+
+            price = periodly_closed_price[1]
+
+            periodly_closed_price_info = numpy.asarray([period_label, price])
+            periodly_closed_price_info_numpy = numpy.append(periodly_closed_price_info_numpy, periodly_closed_price_info, axis=1)
+
+        periodly_closed_price_info_numpy = numpy.flip(periodly_closed_price_info_numpy, axis=0)
+        # print(type(periodly_closed_price_info_list))
+        return periodly_closed_price_info_numpy
+
+    @staticmethod
+    def parseCsv2ClosedPriceNumpy(df):
+        closed_price_info_list = []
         periodly_closed_price_list = df.to_numpy()
         for periodly_closed_price in periodly_closed_price_list:
-            periodly_closed_price_info = []
+            closed_price_info = []
 
             period_label = periodly_closed_price[0]
 
             price = periodly_closed_price[1]
 
-            periodly_closed_price_info = [period_label, price]
-            periodly_closed_price_info_list.append(periodly_closed_price_info)
+            closed_price_info = price
+            closed_price_info_list.append(closed_price_info)
 
-        periodly_closed_price_info_list.reverse()
-        return periodly_closed_price_info_list
+        closed_price_info_list.reverse()
+        return closed_price_info_list
+
 
     @staticmethod
     def parseDateInfo(str_date_time):
@@ -136,6 +162,67 @@ class CryptoDatadownloadBinaceCsvDataParser:
             date_time = pd.to_datetime(str_date_time) # DateTimeUtils.strptime("%Y-%m-%d %H:%M:%S", str_date_time)
         return date_time
 # ========================================================= 以上 輔佐將 csv data 轉換 =========================================================
+
+
+# ========================================================= 以下 轉換 =========================================================
+class PeriodlyCoinPriceInfo:
+
+    _period_col = None
+    _period_freq = None
+    _pre_df = None
+    _filter_not_completed_period = None
+
+    _period_list = []
+    _period_df_dict = {}
+    _period_numpy_dict = {}
+
+    def __init__(self, df, period_col="date", period_freq="7D", filter_not_completed_period = True):
+        self._pre_df = df
+        self._period_col = period_col
+        self._period_freq = period_freq
+        self._filter_not_completed_period = filter_not_completed_period
+
+        self._doSetupInfo()
+
+    """
+    def __iter__(self):
+        return
+    """
+
+    def _doSetupInfo(self):
+        period_grouper = pd.Grouper(key=self._period_col, freq=self._period_freq, origin="start")
+        df_groupby = self._pre_df.groupby(period_grouper)
+        #self._period_list = df_groupby.indices
+        period_list = df_groupby.indices
+
+        """
+        self._period_list = [period for period in period_list if PandasDataFrameHelper.analyzeNums4Rows(df_groupby) == 168]
+        """
+        for period_name in period_list:
+            periodly_df = df_groupby.get_group(period_name)
+            rows = PandasDataFrameHelper.analyzeNums4Rows(periodly_df)
+            if rows == 168:
+                self._period_list.append(period_name)
+                self._period_df_dict[period_name] = periodly_df
+                print(CryptoDatadownloadBinaceCsvDataParser.parseCsv2ClosePriceNumpy(periodly_df))
+                self._period_numpy_dict[period_name] = CryptoDatadownloadBinaceCsvDataParser.parseCsv2ClosePriceNumpy(periodly_df)
+                self._period_numpy_dict[period_name].reverse() #實測periodly_df會被反賺順序 ==> 不對，之前本來就是轉換後反晚?
+
+        print("_pre_df : ")
+        print(self._pre_df)
+
+    def getPeriodList(self):
+        return self._period_list
+
+    def getPeriodNumpyDict(self):
+        return self._period_numpy_dict
+
+    def getPeriodDataFrameDict(self):
+        return self._period_df_dict
+
+    def getPeriodNumpyList(self):
+        return self._period_numpy_dict.values()
+# ========================================================= 以上 轉換 =========================================================
 
 
 # ========================================================= 以下 一些財經相關的算式(?)的methods =========================================================
