@@ -5,6 +5,7 @@ from PandasHelper import PandasDataFrameHelper
 client = CryptoDatadownloadBinaceClient()
 
 hourly_df = client.getHourlyDataFrame(desig_col_list=["date", "close"])
+# hourly_df = client.getHourlyDataFrame4Test()
 # close_df = hourly_df["close"]
 # print(close_df.mean())
 maxmin_noarmalzied_df = PandasDataFrameHelper.processDataNormalizationByMaxMin(hourly_df, ["close"])
@@ -37,6 +38,5 @@ for period in mean_normal_pcpi.getPeriodList():
     numpy = maxmin_normal_pcpi.getPeriodNumpyDict()[period]
     print(numpy)
     print("==========================================================================================")
-
-# print(maxmin_normal_pcpi.getPeriodNumpyList())
 """
+print(maxmin_normal_pcpi.getAllPriceList())
