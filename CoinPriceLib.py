@@ -10,6 +10,7 @@ class CryptoDatadownloadBinaceClient:
     __url_dict = {
         'Daily': 'https://www.cryptodatadownload.com/cdd/Binance_BTCUSDT_d.csv',
         'Hourly': 'https://www.cryptodatadownload.com/cdd/Binance_BTCUSDT_1h.csv',
+        # 'Hourly': './Binance_BTCUSDT_1h.csv',
         'Minute': 'https://www.cryptodatadownload.com/cdd/Binance_BTCUSDT_minute.csv'
     }
 
@@ -224,7 +225,7 @@ class PeriodlyCoinPriceInfo:
         return self._period_df_dict
 
     def getAllPriceList(self):
-        return self._period_price_list_dict.values()
+        return list(self._period_price_list_dict.values())
 # ========================================================= 以上 轉換 =========================================================
 
 
