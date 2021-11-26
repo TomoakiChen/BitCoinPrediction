@@ -24,7 +24,8 @@
       * getHourlyClosedPriceList
 
 ## 市場面資料
-### GlassNode
+### 1. GlassNode
+  * 參考資料：[GlassNode APIs](https://docs.glassnode.com/basic-api/api) 
 
 ## 消息面資料
 ### 1. 新聞爬蟲
