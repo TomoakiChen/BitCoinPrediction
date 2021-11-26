@@ -308,14 +308,12 @@ class MoneyUdnNewsClient(WebDriverClient):
 class BitCoinComNewsClient(HtmlClient):
     def __init__(self):
         super().__init__()
-        self.__url_pattern = 'https://news.bitcoin.com/page/${PAGE}/?s=Bitcoin'
-        # self.__news_since = None # news_since
+        # self.__url_pattern = 'https://news.bitcoin.com/page/${PAGE}/?s=Bitcoin'
+        self.__url_pattern = 'https://news.bitcoin.com/page/${PAGE}/'
         self.__news_until = None # news_until
 
         self.__now_url = None
         self.__now_page = 1
-        #self.__pub_datetime_formats = ['%Y/%m/%d %H:%M', '%Y/%m/%d']
-        # 直接用 isoformat
 
     def findByMaxPages(self, max_pages=10):
         # 如果 __init__ 沒有，下面嘗試設定，這樣不行
@@ -351,7 +349,9 @@ class BitCoinComNewsClient(HtmlClient):
         part_news_info_list = []
 
         self.__doSetupNowUrl()
-        html_parsed_data = self.getHtml(self.__now_url) #目前花時最多的
+        # s=Bitcoin
+        params = {"s": "Bitcoin"}
+        html_parsed_data = self.getHtml(self.__now_url, params=params) #目前花時最多的
 
         # data-desc='新聞列表' > class='searchlist' > li
         news_element_list = html_parsed_data.find("div", class_='td-main-content').findAll(class_='td-animation-stack') #新聞(標題)清單
@@ -421,6 +421,8 @@ class NewsCrawler:
             client = self.__client_dic.get(news_code)
             if client != None:
                 self.__client_list.append(client)
+            else:
+                print("[Warning] Cannot found client by [" + news_code + "]")
 
     def findBySinceDate(self, since_date):
         all_news_info_list = []

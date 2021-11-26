@@ -9,30 +9,64 @@ import urllib.request as req
 
 class HttpClient:
 
-    def obtainHeaders(self):
+    # 這支有可能給繼承使用，所以 protected 的 _ (單底線)
+    def _obtainHeaders(self):
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36"
         }
         return headers
 
-    def sendRequest(self, url, encoded="utf-8"):
-        headers = self.obtainHeaders()
+    def _processGetRequestUrl(self, ori_url, queryParams):
+        if queryParams == None:
+            return ori_url
+        else:
+            result_url = ori_url
+            result_url += "?"
+            for index, (queryParamKey, queryParamValue) in enumerate(queryParams.items()):
+                if index >= 1:
+                    result_url += "&"
+                result_url += queryParamKey
+                result_url += "="
+                result_url += str(queryParamValue)
+                # print("index = " + str(index) + ", queryParamKey = " + queryParamKey + ", queryParamValue = " + queryParamValue)
+            return result_url
+
+    def _obtainPostFormParamsData(self, formParams):
+        pass
+
+    def sendRequest(self, url, method="GET", params=None):
+        if method == "GET":
+            return self.sendGetRequest(url, queryParams=params)
+        elif method == "POST":
+            return self.sendPostRequest(url, formParams)
+        else:
+            return self.sendGetRequest(url, queryParams=params)
+
+    def sendGetRequest(self, url, encoded="utf-8", queryParams=None):
+        headers = self._obtainHeaders()
+        url = self._processGetRequestUrl(url, queryParams)
         URL = req.Request(url, headers=headers)
         with req.urlopen(URL) as res:
             pageData = res.read().decode(encoded)
         return pageData
 
+    def sendPostRequest(self, url , encoded="utf-8", formParams=None):
+        headers = self._obtainHeaders()
+        datas = self._obtainPostFormParamsData(formParams)
+        URL = req.Request(url, headers=headers)
+        with req.urlopen(URL) as res:
+            pageData = res.read().decode(encoded)
+        return pageData
 
 class HtmlClient:
 
     def __init__(self):
         self.__httpClient = HttpClient()
 
-    def getHtml(self, url):
-        pageData = self.__httpClient.sendRequest(url)
+    def getHtml(self, url, params):
+        pageData = self.__httpClient.sendRequest(url, params=params)
         parsedData = bs4.BeautifulSoup(pageData, "lxml")
         return parsedData
-
 
 # ============================================================================================================================================
 class WebDriverClient:

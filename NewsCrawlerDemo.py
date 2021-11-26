@@ -4,7 +4,7 @@ from datetime import datetime, date
 
 start = datetime.now()
 # crawler = NewsCrawler(news_sources=["Bitcoin.com"])
-crawler = NewsCrawler(news_sources=["LTN"])
+crawler = NewsCrawler(news_sources=["Bitcoin.com"])
 since_date = date.fromisoformat('2021-10-01')
 news_list = crawler.findBySinceDate(since_date)
 end = datetime.now()
