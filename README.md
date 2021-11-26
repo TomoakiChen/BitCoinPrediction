@@ -18,6 +18,10 @@
     * CryptoDatadownloadBinaceClient 抓幣安資料
       * 初始化參數
         無
+      * getDailyDataFrame
+      * getHourlyDataFrame
+      * getDailyClosedPriceList
+      * getHourlyClosedPriceList
 
 ## 市場面資料
 ### GlassNode
