@@ -30,7 +30,6 @@ class CryptoDatadownloadBinaceClient:
 
     def _processingDataFrame(self, df):
         df = self._processingDateInfo(df)
-
         return df
 
     def _processingDateInfo(self, df):
@@ -39,17 +38,40 @@ class CryptoDatadownloadBinaceClient:
             date_datas.append(CryptoDatadownloadBinaceCsvDataParser.parseDateInfo(date_data))
         df["date"] = date_datas
         return df
+
+    def _filteringeDateRange(self, df, since, until):
+        if since == None and until == None:
+            return df
+        elif since != None and until == None:
+            if isinstance(since, DateUtils) or isinstance(since, DateTimeUtils):
+                since = str(since)
+            return df[(df['date'] >= since)]
+        elif since == None and until != None:
+            if isinstance(until, DateUtils) or isinstance(until, DateTimeUtils):
+                until = str(until)
+            return df[(df['date'] <= until)]
+        else:
+            if isinstance(since, DateUtils) or isinstance(since, DateTimeUtils):
+                since = str(since)
+            if isinstance(until, DateUtils) or isinstance(until, DateTimeUtils):
+                until = str(until)
+            print("type of since = " + str(type(since)))
+            print("type of until = " + str(type(until)))
+            return df[(df['date'] >= since & df['date'] <= until)]
+
     # ==================================================== 以下是 csv初始的 DataFrame 格式 ====================================================
-    def getDailyDataFrame(self, desig_col_list=None):
+    def getDailyDataFrame(self, desig_col_list=None, since=None, until=None):
         # 第一行是 CryptoDatadownload 的標註
         df = self._readCsv(self.__url_dict.get('Daily'))
+        df = self._filteringeDateRange(df, since, until)
         if desig_col_list == None:
             return df
         else:
             return df[desig_col_list]
 
-    def getHourlyDataFrame(self, desig_col_list=None):
+    def getHourlyDataFrame(self, desig_col_list=None, since=None, until=None):
         df = self._readCsv(self.__url_dict.get('Hourly'))
+        df = self._filteringeDateRange(df, since, until)
         if desig_col_list == None:
             return df
         else:

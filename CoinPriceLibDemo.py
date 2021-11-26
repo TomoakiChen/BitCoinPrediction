@@ -41,10 +41,10 @@ print(daily_price_changed_info_list[:])
 """
 
 
-
+"""
 hourly_price_info_list = client.getHourlyClosedPriceList()
 print(hourly_price_info_list)
-
+"""
 
 """
 hourly_price_changed_info_list = client.getHourlyClosedPriceChangeNumpy()

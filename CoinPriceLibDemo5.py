@@ -5,9 +5,12 @@ from PandasHelper import PandasDataFrameHelper
 import json
 import numpy
 
+from datetime import date
+
 client = CryptoDatadownloadBinaceClient()
 
-hourly_df = client.getHourlyDataFrame(desig_col_list=["date", "close"])
+hourly_df = client.getHourlyDataFrame(desig_col_list=["date", "close"], since='2020-01-01', until=date.today())
+print(hourly_df)
 # hourly_df = client.getHourlyDataFrame4Test()
 # close_df = hourly_df["close"]
 # print(close_df.mean())
