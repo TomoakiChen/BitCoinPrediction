@@ -14,7 +14,7 @@ class CryptoDatadownloadBinaceClient:
         'Minute': 'https://www.cryptodatadownload.com/cdd/Binance_BTCUSDT_minute.csv'
     }
 
-    def __init__(self):
+    def __init__(self): 
         pass
 
     def _readCsv(self, url):
