@@ -12,7 +12,7 @@ class NewsInfoHelper:
     @staticmethod
     def filterBySincaDate(ori_news_info_list, since_date):
         since_datetime = datetime.combine(since_date, datetime.min.time())
-        filtered_news_info_list = [news_info for news_info in ori_news_info_list if news_info.getPubDateTime().timestamp() >= since_datetime.timestamp()]
+        filtered_news_info_list = [news_info for news_info in ori_news_info_list if news_info.getPubDateTime() != None and news_info.getPubDateTime().timestamp() >= since_datetime.timestamp()]
         return filtered_news_info_list
 
 class NewsCrawlerHelper:
@@ -145,7 +145,6 @@ class YahooNewsClient(WebDriverClient):
         actions.pause(5)
         # actions.perform()
         parsed_data = self.getHtml(self.__url, action_chains=actions)
-        #print("parsed_data=", parsed_data)
         self.__now_page += 1
 
         news_info_list = []
@@ -404,19 +403,29 @@ class NewsCrawler:
       "Bitcoin.Com": BitCoinComNewsClient()
     }
     """
+    # __client_dic = {
+    #   "LTN": LTNNewsClient(),
+    #   "Yahoo": YahooNewsClient(headless=True),
+    #   "cnYES": cnYESNewsClient(headless=True),
+    #   "MoneyUdn": MoneyUdnNewsClient(headless=True),
+    #   "Bitcoin.com": BitCoinComNewsClient()
+    # }
     __client_dic = {
-      "LTN": LTNNewsClient(),
-      "Yahoo": YahooNewsClient(headless=True),
-      "cnYES": cnYESNewsClient(headless=True),
-      "MoneyUdn": MoneyUdnNewsClient(headless=True),
-      "Bitcoin.com": BitCoinComNewsClient()
+      "LTN": LTNNewsClient,
+      "Yahoo": YahooNewsClient,
+      "cnYES": cnYESNewsClient,
+      "MoneyUdn": MoneyUdnNewsClient,
+      "Bitcoin.com": BitCoinComNewsClient
     }
 
-    def __init__(self, news_sources=["LTN", "cnYES", "Bitcoin.com"]):
+    def __init__(self, news_sources=None):
         self.__client_list = []
         self.__setupClientList(news_sources)
 
+
     def __setupClientList(self, news_sources):
+        if news_sources == None:
+            news_sources = list(self.__client_dic.keys() )
         for news_code in news_sources:
             client = self.__client_dic.get(news_code)
             if client != None:
@@ -426,7 +435,13 @@ class NewsCrawler:
 
     def findBySinceDate(self, since_date):
         all_news_info_list = []
-        for client in self.__client_list:
+        for clientClazz in self.__client_list:
+            client = clientClazz()
             news_info_list = client.findBySinceDate(since_date)
             all_news_info_list.extend(news_info_list)
+            client.close()
         return all_news_info_list
+
+    def closeAll(self):
+        for client in self.__client_list:
+            client.close()
