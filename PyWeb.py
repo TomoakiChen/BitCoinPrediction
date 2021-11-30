@@ -58,15 +58,22 @@ class HttpClient:
             pageData = res.read().decode(encoded)
         return pageData
 
+    def close(self):
+        print("HttpClient.close()")
+        pass
+
 class HtmlClient:
 
     def __init__(self):
         self.__httpClient = HttpClient()
 
-    def getHtml(self, url, params):
+    def getHtml(self, url, params=None):
         pageData = self.__httpClient.sendRequest(url, params=params)
         parsedData = bs4.BeautifulSoup(pageData, "lxml")
         return parsedData
+
+    def close(self):
+        self.__httpClient.close()
 
 # ============================================================================================================================================
 class WebDriverClient:
@@ -91,9 +98,14 @@ class WebDriverClient:
         # self._browser_driver.get(url)
         if action_chains != None:
             action_chains.perform()
-        page_data = self._browser_driver.page_source
+        page_data = (self._browser_driver.page_source).encode('utf-8') # https://stackoverflow.com/questions/16823086/selenium-webdriver-and-unicode
         parsed_data = bs4.BeautifulSoup(page_data, "lxml")
+        print("parsed_data = " + str(parsed_data) )
         return parsed_data
+
+    def close(self):
+        print("WebDriverClient close()")
+        self._browser_driver.quit()
 
     """
     # 目前難以寫成一種方便使用的底層 method，此專案中先在 YahooNewsClient
