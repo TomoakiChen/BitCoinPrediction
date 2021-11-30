@@ -1,10 +1,11 @@
 from NewsCrawler import LTNNewsClient, YahooNewsClient, cnYESNewsClient, MoneyUdnNewsClient, NewsCrawler, BitCoinComNewsClient
 from datetime import datetime, date
+from PandasHelper import PandasDataFrameHelper
 
-
+# sources = ["LTN", "cnYES", "MoneyUdn", "Bitcoin.com"]
+sources = ["cnYES", "Bitcoin.com"]
 start = datetime.now()
-# crawler = NewsCrawler(news_sources=["Bitcoin.com"])
-crawler = NewsCrawler(news_sources=["Bitcoin.com"])
+crawler = NewsCrawler(news_sources=sources)
 since_date = date.fromisoformat('2021-10-01')
 news_list = crawler.findBySinceDate(since_date)
 end = datetime.now()
@@ -13,6 +14,9 @@ for news in news_list:
     print(news)
 print("total nums = ", len(news_list))
 print("cost = ", (end - start))
+
+# PandasDataFrameHelper.parseObjectList2DataFrame(news_list)
+
 # --------------------------------- 以下是 自由時報格式 ---------------------------------
 """
 start = datetime.now()
