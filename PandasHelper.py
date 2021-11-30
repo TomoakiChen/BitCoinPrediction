@@ -11,6 +11,14 @@ class PandasDataFrameHelper:
         return df.shape[1]
 
     @staticmethod
+    def parseObjectList2DataFrame(objList):
+        for obj in objList:
+            print(dir(obj) )
+            # dictObj = obj.__dict__
+            # for key in dictObj.keys():
+            #     print(key)
+
+    @staticmethod
     def processDataNormalizationByMean(df, desig_col_list):
         normalized_df = df
         desig_col_df = normalized_df[desig_col_list]
