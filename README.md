@@ -25,7 +25,7 @@
 
 ## 市場面資料
 ### 1. GlassNode
-  * 參考資料：[GlassNode APIs](https://docs.glassnode.com/basic-api/api) 
+  * 參考資料：[GlassNode APIs](https://docs.glassnode.com/basic-api/api)
 
 ## 消息面資料
 ### 1. 新聞爬蟲
@@ -47,7 +47,7 @@
     |自由時報 |LTN|LTNNewsClient||
     |Yahoo新聞|Yahoo|YahooNewsClient|目前不支援 getBySinceDate()|
     |鉅亨網|cnYES|cnYESNewsClient||
-    |經濟日報|MoneyUdn|MoneyUdnNewsClient||
+    |經濟日報|MoneyUdn|MoneyUdnNewsClient|目前對於時間過濾尚有問題，修正中|
     |Bitcoin.com|Bitcoin.com|BitCoinComNewsClient||
 
 
