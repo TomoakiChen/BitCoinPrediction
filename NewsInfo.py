@@ -49,7 +49,13 @@ class NewsInfoConverter:
     def __init__(self):
         pass
 """
+from PandasHelper import PandasDataFrameHelper
 class NewsInfoHelper:
+
+    @staticmethod
+    def parseInfoList2DataFrame(newsInfoList, desig_col_list=None):
+        return PandasDataFrameHelper.parseObjectList2DataFrame(newsInfoList, NewsInfoHelper.parseInfo2Dict, desig_col_list)
+
 
     @staticmethod
     def parseInfoList2DictList(newsInfoList):
@@ -65,5 +71,5 @@ class NewsInfoHelper:
         dict["link"] = newsInfo.getLink()
         dict["title"] = newsInfo.getTitle()
         dict["content"] = newsInfo.getContent()
-        dict["pubDateTime"] = newsInfo.getPubDateTime()
+        dict["pubDateTime"] = newsInfo.getPubDateTime().strftime("%Y-%m-%d %H:%M:%S")
         return dict
