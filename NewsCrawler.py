@@ -54,7 +54,7 @@ class LTNNewsClient(HtmlClient):
             # start2 = datetime.now()
             filtered_part_news_info_list = [news_info for news_info in part_news_info_list if news_info.getPubDateTime() >= since_datetime]
             # end2 = datetime.now()
-            # print("cost2 = ", (end2 - start2))
+            # print("cost2 = ", (end2 - start2)) 
 
             # start3 = datetime.now()
             news_info_list.extend(filtered_part_news_info_list)
