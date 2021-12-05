@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #import datetime #https://stackoverflow.com/questions/50639415/attributeerror-module-datetime-has-no-attribute-now 這個用起來有點問題，換下面的
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from PyWeb import HtmlClient, WebDriverClient
 from NewsInfo import NewsInfo
 from selenium.webdriver.common.by import By
@@ -410,14 +410,16 @@ class NewsCrawler:
     #   "MoneyUdn": MoneyUdnNewsClient(headless=True),
     #   "Bitcoin.com": BitCoinComNewsClient()
     # }
-    __client_dic = {
+    __client_clazz_dict = {
       "LTN": LTNNewsClient,
       "Yahoo": YahooNewsClient,
       "cnYES": cnYESNewsClient,
       "MoneyUdn": MoneyUdnNewsClient,
       "Bitcoin.com": BitCoinComNewsClient
     }
+    __client_dict = dict()
 
+    """
     def __init__(self, news_sources=None):
         self.__client_list = []
         self.__setupClientList(news_sources)
@@ -433,15 +435,66 @@ class NewsCrawler:
             else:
                 print("[Warning] Cannot found client by [" + news_code + "]")
 
-    def findBySinceDate(self, since_date):
+    def findBySinceDate(self, since_date, close_after_iter = True):
         all_news_info_list = []
         for clientClazz in self.__client_list:
             client = clientClazz()
             news_info_list = client.findBySinceDate(since_date)
             all_news_info_list.extend(news_info_list)
-            client.close()
+            if close_after_iter == True:
+                client.close()
         return all_news_info_list
+    """
+    def __init__(self, news_sources=None):
+        self.__setupClientDict(news_sources)
+
+    def __obtainClient(self, client_clazz):
+        return client_clazz()
+
+
+    def __setupClientDict(self, news_sources):
+        if news_sources == None:
+            news_sources = list(self.__client_clazz_dict.keys() )
+
+        for news_code in news_sources:
+            client_clazz = self.__client_clazz_dict.get(news_code)
+
+            if client_clazz != None:
+                client = client_clazz()
+                self.__client_dict[news_code] = client
+            else:
+                print("[Warning] Cannot found client_clazz by [" + news_code + "]")
+
+    def findBySinceDate(self, since_date, close_after_iter = True):
+        all_news_info_list = []
+        client_list = list(self.__client_dict.values() )
+        for client in client_list:
+            news_info_list = client.findBySinceDate(since_date)
+            all_news_info_list.extend(news_info_list)
+            if close_after_iter == True:
+                client.close()
+        return all_news_info_list
+
 
     def closeAll(self):
         for client in self.__client_list:
             client.close()
+
+class NewsCsvCrawler(NewsCrawler):
+
+    def __init__(self, news_sources = None):
+        super().__init__(news_sources)
+
+
+    def save2Csv(self, since_date, days_freq=7):
+        now_since_date = date.today()
+        the_timedelta = timedelta(days=days_freq)
+        while True:
+            now_since_date = now_since_date - the_timedelta
+            if now_since_date < since_date:
+                now_since_date = since_date # 如果已經到希望的前面 since_date，則只讓他到這個 since_date
+
+            self.findBySinceDate(now_since_date)
+
+            if now_since_date == since_date:
+                break
