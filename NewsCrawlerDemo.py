@@ -4,7 +4,7 @@ from PandasHelper import PandasDataFrameHelper
 from NewsInfo import NewsInfoHelper
 
 # sources = ["LTN", "cnYES", "MoneyUdn", "Bitcoin.com"]
-sources = ["cnYES", "Bitcoin.com"]
+sources = ["LTN", "cnYES", "Bitcoin.com"]
 start = datetime.now()
 crawler = NewsCrawler(news_sources=sources)
 since_date = date.fromisoformat('2021-11-25')

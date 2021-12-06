@@ -44,23 +44,11 @@ class LTNNewsClient(HtmlClient):
 
     def findBySinceDate(self, since_date = date.today()):
         news_info_list = []
-        since_datetime = datetime.combine(since_date, datetime.min.time())
+        # since_datetime = datetime.combine(since_date, datetime.min.time())
         while True:
-            # start1 = datetime.now()
             part_news_info_list = self.__miningOnePage()
-            # end1 = datetime.now()
-            # print("cost1 = ", (end1 - start1))
-
-            # start2 = datetime.now()
-            filtered_part_news_info_list = [news_info for news_info in part_news_info_list if news_info.getPubDateTime() >= since_datetime]
-            # end2 = datetime.now()
-            # print("cost2 = ", (end2 - start2))
-
-            # start3 = datetime.now()
+            filtered_part_news_info_list = NewsInfoHelper.filterBySincaDate(part_news_info_list, since_date) # [news_info for news_info in part_news_info_list if news_info.getPubDateTime() >= since_datetime]
             news_info_list.extend(filtered_part_news_info_list)
-            # end3 = datetime.now()
-            # print("cost3 = ", (end3 - start3))
-
 
             if len(filtered_part_news_info_list) != len(part_news_info_list):
                 break;
@@ -77,21 +65,14 @@ class LTNNewsClient(HtmlClient):
 
     def __miningOnePage(self):
         part_news_info_list = []
-
-        # start1_1 = datetime.now()
         self.__doSetupNowUrl()
         html_parsed_data = self.getHtml(self.__now_url) #目前花時最多的
-        # end1_1 = datetime.now()
-        # print("cost1_1 = ", (end1_1 - start1_1))
 
-        # start1_2 = datetime.now()
         # data-desc='新聞列表' > class='searchlist' > li
         news_element_list = html_parsed_data.find(class_='searchlist').findAll('li') #新聞(標題)清單
         for news_element in news_element_list:
             news_info = self.__obtainNewsInfo(news_element)
             part_news_info_list.append(news_info)
-        # end1_2 = datetime.now()
-        # print("cost1_2 = ", (end1_2 - start1_2))
         return part_news_info_list
 
     def __obtainPubDateTime(self, str_pub_datetime):
@@ -203,7 +184,7 @@ class cnYESNewsClient(WebDriverClient):
         actions.pause(5)
         # actions.perform()
         parsed_data = self.getHtml(self.__url, action_chains=actions)
-        #print("parsed_data=", parsed_data)
+        # print("parsed_data=", parsed_data)
         self.__now_page += 1
 
         news_info_list = []
@@ -494,7 +475,7 @@ class NewsCsvCrawler(NewsCrawler):
             if now_since_date < since_date:
                 now_since_date = since_date # 如果已經到希望的前面 since_date，則只讓他到這個 since_date
 
-            self.findBySinceDate(now_since_date)
+            self.findBySinceDate(now_since_date) #這裡對於「url 指定 page num 」的可以變成繼續撈「尚未撈過的」，但對於那種頁面到底的反而還是不行
 
             if now_since_date == since_date:
                 break
