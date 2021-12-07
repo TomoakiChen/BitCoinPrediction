@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #import datetime #https://stackoverflow.com/questions/50639415/attributeerror-module-datetime-has-no-attribute-now 這個用起來有點問題，換下面的
 from datetime import datetime, date, timedelta
+from AkiPyDateTime import AkiDateTimeUtil
 from PyWeb import HtmlClient, WebDriverClient
 from NewsInfo import NewsInfo
 from selenium.webdriver.common.by import By
@@ -14,6 +15,16 @@ class NewsInfoHelper:
         since_datetime = datetime.combine(since_date, datetime.min.time())
         filtered_news_info_list = [news_info for news_info in ori_news_info_list if news_info.getPubDateTime() != None and news_info.getPubDateTime().timestamp() >= since_datetime.timestamp()]
         return filtered_news_info_list
+
+    @staticmethod
+    def checkIsAfterSinceDate(news_info, since_date):
+        pub_datetime = news_info.getPubDateTime()
+        return AkiDateTimeUtil(pub_datetime, since_date)
+
+    @staticmethod
+    def checkIsBeforeEqUntilDate(news_info, since_date):
+        pub_datetime = news_info.getPubDateTime()
+        return AkiDateTimeUtil(pub_datetime, since_date)
 
 class NewsCrawlerHelper:
     @staticmethod
