@@ -88,6 +88,7 @@ class WebDriverClient:
             if headless:
                 # 這樣可以不用打開實際的瀏覽器 https://stackoverflow.com/questions/7593611/selenium-testing-without-browser
                 op.add_argument('headless')
+                op.add_argument("--log-level=3")
             return webdriver.Chrome(options=op)
         elif driver_type == 'Firefox':
             return webdriver.Firefox()
@@ -100,7 +101,7 @@ class WebDriverClient:
             action_chains.perform()
         page_data = (self._browser_driver.page_source).encode('utf-8') # https://stackoverflow.com/questions/16823086/selenium-webdriver-and-unicode
         parsed_data = bs4.BeautifulSoup(page_data, "lxml")
-        print("parsed_data = " + str(parsed_data) )
+        # print("parsed_data = " + str(parsed_data) )
         return parsed_data
 
     def close(self):

@@ -4,10 +4,11 @@ from PandasHelper import PandasDataFrameHelper
 from NewsInfo import NewsInfoHelper
 
 # sources = ["LTN", "cnYES", "MoneyUdn", "Bitcoin.com"]
-sources = ["LTN", "cnYES", "Bitcoin.com"]
+# sources = ["LTN", "cnYES", "Bitcoin.com"]
+sources = ["cnYES", "MoneyUdn"]
 start = datetime.now()
 crawler = NewsCrawler(news_sources=sources)
-since_date = date.fromisoformat('2021-11-25')
+since_date = date.fromisoformat('2021-11-01')
 news_list = crawler.findBySinceDate(since_date)
 end = datetime.now()
 

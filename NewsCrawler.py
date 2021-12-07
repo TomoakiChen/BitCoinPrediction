@@ -17,14 +17,19 @@ class NewsInfoHelper:
         return filtered_news_info_list
 
     @staticmethod
-    def checkIsAfterSinceDate(news_info, since_date):
+    def checkIsAfterEqSinceDate(news_info, since_date = None):
         pub_datetime = news_info.getPubDateTime()
-        return AkiDateTimeUtil(pub_datetime, since_date)
+        return AkiDateTimeUtil.checkIsAfterEqSinceDate(pub_datetime, since_date)
 
     @staticmethod
-    def checkIsBeforeEqUntilDate(news_info, since_date):
+    def checkIsBeforeEqUntilDate(news_info, until_date = None):
         pub_datetime = news_info.getPubDateTime()
-        return AkiDateTimeUtil(pub_datetime, since_date)
+        return AkiDateTimeUtil.checkIsBeforeEqUntilDate(pub_datetime, since_date)
+
+    @staticmethod
+    def checkIsInInterval(news_info, since_date = None, until_date = None):
+        pub_datetime = news_info.getPubDateTime()
+        return AkiDateTimeUtil.checkIsInInterval(pub_datetime, since_date, until_date)
 
 class NewsCrawlerHelper:
     @staticmethod
@@ -86,6 +91,7 @@ class LTNNewsClient(HtmlClient):
             part_news_info_list.append(news_info)
         return part_news_info_list
 
+    # ============================ 下面跟 NewsInfo 有關 ============================
     def __obtainPubDateTime(self, str_pub_datetime):
         for pub_datetime_format in self.__pub_datetime_formats:
             try:
@@ -107,6 +113,7 @@ class LTNNewsClient(HtmlClient):
         news_info.setTitle(title_link_element.find('h3').getText()) #新聞標題
 
         return news_info
+    # ============================ 上面跟 NewsInfo 有關 ============================
 
 class YahooNewsClient(WebDriverClient):
 
@@ -172,13 +179,25 @@ class cnYESNewsClient(WebDriverClient):
         return news_info_list
 
     def findBySinceDate(self, since_date=date.today()):
+        return self.findByInterval(since_date, None)
+
+    def findByUntilDate(self, until_date=date.today()):
+        return self.findByInterval(None, until_date)
+
+    def findByInterval(self, since_date=date.today(), until_date=date.today()):
         self.__doReadyLoadPage()
         news_info_list = []
         while True:
-            ori_news_info_list = self.__miningOnePage()
-            filtered_news_info_list = NewsInfoHelper.filterBySincaDate(ori_news_info_list, since_date)
-            news_info_list = filtered_news_info_list
-            if NewsCrawlerHelper.needStopMining(ori_news_info_list, filtered_news_info_list):
+            news_element_list = self.__miningOnePage()
+            earliest_news_element = news_element_list[-1]
+            earliest_news_info = self.__obtainNewsInfo(earliest_news_element)
+            print("earliest_news_info = " + str(earliest_news_info))
+            print("since_date = " + str(since_date))
+            if(NewsInfoHelper.checkIsAfterEqSinceDate(earliest_news_info, since_date) == False):
+                for news_element in news_element_list:
+                    news_info = self.__obtainNewsInfo(news_element)
+                    if NewsInfoHelper.checkIsInInterval(news_info, since_date, until_date):
+                        news_info_list.append(news_info)
                 break
         return news_info_list
 
@@ -195,16 +214,13 @@ class cnYESNewsClient(WebDriverClient):
         actions.pause(5)
         # actions.perform()
         parsed_data = self.getHtml(self.__url, action_chains=actions)
-        # print("parsed_data=", parsed_data)
         self.__now_page += 1
 
         news_info_list = []
         # '[id="__SearchAll"]'(搜尋結果外框) > a[class="news"] (每一條新聞)
         news_element_list = parsed_data.find(id="_SearchAll").findAll("a", class_='news')
-        for news_element in news_element_list:
-            news_info = self.__obtainNewsInfo(news_element)
-            news_info_list.append(news_info)
-        return news_info_list
+        return news_element_list
+
 
     def __obtainNewsInfo(self, news_element):
         news_info = NewsInfo()
@@ -244,15 +260,30 @@ class MoneyUdnNewsClient(WebDriverClient):
         return news_info_list
 
     def findBySinceDate(self, since_date=date.today()):
+        return self.findByInterval(since_date, None)
+
+    def findByUntilDate(self, until_date=date.today()):
+        return self.findByInterval(None, until_date)
+
+    def findByInterval(self, since_date=date.today(), until_date=date.today()):
         self.__doReadyLoadPage()
         news_info_list = []
         while True:
-            ori_news_info_list = self.__miningOnePage()
-            filtered_news_info_list = NewsInfoHelper.filterBySincaDate(ori_news_info_list, since_date)
-            news_info_list = filtered_news_info_list
-            if NewsCrawlerHelper.needStopMining(ori_news_info_list, filtered_news_info_list):
+            news_element_list = self.__miningOnePage()
+            earliest_news_element = news_element_list[-1]
+            earliest_news_info = self.__obtainNewsInfo(earliest_news_element)
+            print("earliest_news_info = " + str(earliest_news_info))
+            print ("since_date = " + str(since_date))
+            if(NewsInfoHelper.checkIsAfterEqSinceDate(earliest_news_info, since_date) == False):
+                for news_element in news_element_list:
+                    news_info = self.__obtainNewsInfo(news_element)
+                    if NewsInfoHelper.checkIsInInterval(news_info, since_date, until_date):
+                        news_info_list.append(news_info)
                 break
         return news_info_list
+
+
+
 
     def __doReadyLoadPage(self):
         self._browser_driver.get(self.__url)
@@ -273,10 +304,7 @@ class MoneyUdnNewsClient(WebDriverClient):
         news_info_list = []
         # '[id="__SearchAll"]'(搜尋結果外框) > a[class="news"] (每一條新聞)
         news_element_list = parsed_data.find("ul", class_="story-list-holder").findAll("li", class_='story-headline-wrapper')
-        for news_element in news_element_list:
-            news_info = self.__obtainNewsInfo(news_element)
-            news_info_list.append(news_info)
-        return news_info_list
+        return news_element_list
 
     def __obtainNewsInfo(self, news_element):
         news_info = NewsInfo()
@@ -469,7 +497,8 @@ class NewsCrawler:
 
 
     def closeAll(self):
-        for client in self.__client_list:
+        client_list = list(self.__client_dict.values() )
+        for client in client_list:
             client.close()
 
 class NewsCsvCrawler(NewsCrawler):
@@ -479,6 +508,7 @@ class NewsCsvCrawler(NewsCrawler):
 
 
     def save2Csv(self, since_date, days_freq=7):
+        news_info_list = list()
         now_since_date = date.today()
         the_timedelta = timedelta(days=days_freq)
         while True:
@@ -486,7 +516,10 @@ class NewsCsvCrawler(NewsCrawler):
             if now_since_date < since_date:
                 now_since_date = since_date # 如果已經到希望的前面 since_date，則只讓他到這個 since_date
 
-            self.findBySinceDate(now_since_date) #這裡對於「url 指定 page num 」的可以變成繼續撈「尚未撈過的」，但對於那種頁面到底的反而還是不行
+            part_news_info_list = self.findBySinceDate(now_since_date, close_after_iter = False)
+            #這裡對於「url 指定 page num 」的可以變成繼續撈「尚未撈過的」，但對於那種頁面到底的反而還是不行
+
 
             if now_since_date == since_date:
+                self.closeAll()
                 break
