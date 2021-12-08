@@ -10,6 +10,14 @@ from selenium.webdriver.common.keys import Keys
 
 class PaginationClient(HtmlClient):
 
+    def __init__(self):
+        pass
+
+class AjaxRefreshClient(WebDriverClient):
+
+    def __init__(self):
+        pass
+
 
 
 class NewsInfoHelper:
@@ -39,7 +47,7 @@ class NewsCrawlerHelper:
     def needStopMining(news_info_list, filtered_news_info_list):
         return len(filtered_news_info_list) != len(news_info_list)
 
-class LTNNewsClient(HtmlClient):
+class LTNNewsClient(PaginationClient):
 
     def __init__(self):
         super().__init__()
@@ -118,7 +126,7 @@ class LTNNewsClient(HtmlClient):
         return news_info
     # ============================ 上面跟 NewsInfo 有關 ============================
 
-class YahooNewsClient(WebDriverClient):
+class YahooNewsClient(AjaxRefreshClient):
 
     def __init__(self, url='https://tw.news.yahoo.com/tag/比特幣', headless=True):
         super().__init__(headless=headless)
@@ -166,7 +174,7 @@ class YahooNewsClient(WebDriverClient):
         news_info.setLink(link_url)
         return news_info
 
-class cnYESNewsClient(WebDriverClient):
+class cnYESNewsClient(AjaxRefreshClient):
 
     def __init__(self, url='https://www.cnyes.com/search/news?keyword=比特幣', headless=True):
         super().__init__(headless=headless)
@@ -327,7 +335,7 @@ class MoneyUdnNewsClient(WebDriverClient):
         # news_info.setPubDateTime(pub_datetime)
         return news_info
 
-class BitCoinComNewsClient(HtmlClient):
+class BitCoinComNewsClient(PaginationClient):
     def __init__(self):
         super().__init__()
         # self.__url_pattern = 'https://news.bitcoin.com/page/${PAGE}/?s=Bitcoin'
@@ -409,7 +417,7 @@ class BitCoinComNewsClient(HtmlClient):
         news_info.setPubDateTime(pub_datetime)
         return news_info
 
-class CNBCNewsClient(WebDriverClient):
+class CNBCNewsClient(AjaxRefreshClient):
 
     def __init__(self, url='https://www.cnbc.com/search/?query=Bitcoin&qsearchterm=Bitcoin', headless=True):
         super().__init__(headless=headless)
