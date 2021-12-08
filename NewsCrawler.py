@@ -8,6 +8,9 @@ from selenium.webdriver.common.by import By
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
+class PaginationClient(HtmlClient):
+
+
 
 class NewsInfoHelper:
     @staticmethod
@@ -512,6 +515,7 @@ class NewsCsvCrawler(NewsCrawler):
         now_since_date = date.today()
         the_timedelta = timedelta(days=days_freq)
         while True:
+            # 可能要分類，利用 WebDriverClient (或該說，利用 refresh 機制的網站)，應該要最後直接下到最後一天?
             now_since_date = now_since_date - the_timedelta
             if now_since_date < since_date:
                 now_since_date = since_date # 如果已經到希望的前面 since_date，則只讓他到這個 since_date
