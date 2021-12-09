@@ -30,18 +30,30 @@ class NewsInfoHelper:
         return filtered_news_info_list
 
     @staticmethod
+    def filterByInterval(ori_news_info_list, since_date, end_date):
+        filtered_news_info_list = [news_info for news_info in ori_news_info_list if NewsInfoHelper.checkIsInInterval(news_info, since_date, end_date)]
+        # print("ori-nums = " + str(len(ori_news_info_list)) + " filterd_nums = " + str(len(ori_news_info_list))  )
+        return filtered_news_info_list
+
+    @staticmethod
     def checkIsAfterEqSinceDate(news_info, since_date=None):
         pub_datetime = news_info.getPubDateTime()
+        if pub_datetime == None:
+            return False
         return AkiDateTimeUtil.checkIsAfterEqSinceDate(pub_datetime, since_date)
 
     @staticmethod
     def checkIsBeforeEqUntilDate(news_info, until_date=None):
         pub_datetime = news_info.getPubDateTime()
+        if pub_datetime == None:
+            return False
         return AkiDateTimeUtil.checkIsBeforeEqUntilDate(pub_datetime, since_date)
 
     @staticmethod
     def checkIsInInterval(news_info, since_date=None, until_date=None):
         pub_datetime = news_info.getPubDateTime()
+        if pub_datetime == None:
+            return False
         return AkiDateTimeUtil.checkIsInInterval(pub_datetime, since_date, until_date)
 
 
@@ -74,25 +86,25 @@ class LTNNewsClient(PaginationClient):
         return news_info_list
 
     def findBySinceDate(self, since_date=date.today()):
+        return self.findByInterval(since_date, None)
+
+    def findByInterval(self, since_date=date.today(), until_date=date.today()):
         news_info_list = []
         # since_datetime = datetime.combine(since_date, datetime.min.time())
         while True:
             part_news_info_list = self.__miningOnePage()
             # [news_info for news_info in part_news_info_list if news_info.getPubDateTime() >= since_datetime]
-            filtered_part_news_info_list = NewsInfoHelper.filterBySincaDate(
-                part_news_info_list, since_date)
+            filtered_part_news_info_list = NewsInfoHelper.filterByInterval(part_news_info_list, since_date, until_date)
             news_info_list.extend(filtered_part_news_info_list)
 
-            if len(filtered_part_news_info_list) != len(part_news_info_list):
+            earliest_news_info = part_news_info_list[-1]
+            earliest_pub_datetime = earliest_news_info.getPubDateTime()
+            if(NewsInfoHelper.checkIsAfterEqSinceDate(earliest_news_info, since_date) == False):
                 break
         return news_info_list
 
-    def findByInterval(self,):
-        pass
-
     def __doSetupNowUrl(self):
-        self.__now_url = self.__url_pattern.replace(
-            '${PAGE}', str(self.__now_page))
+        self.__now_url = self.__url_pattern.replace('${PAGE}', str(self.__now_page))
         # print(self._now_url)
         self.__now_page += 1
 
@@ -369,6 +381,7 @@ class BitCoinComNewsClient(PaginationClient):
             news_info_list.extend(part_news_info_list)
         return news_info_list
 
+    """
     def findBySinceDate(self, since_date=date.today()):
         news_info_list = []
         since_datetime = datetime.combine(since_date, datetime.min.time())
@@ -383,10 +396,27 @@ class BitCoinComNewsClient(PaginationClient):
 
     def findByInterval(self):
         pass
+    """
+    def findBySinceDate(self, since_date=date.today()):
+        return self.findByInterval(since_date, None)
 
+    def findByInterval(self, since_date=date.today(), until_date=date.today()):
+        news_info_list = []
+        # since_datetime = datetime.combine(since_date, datetime.min.time())
+        while True:
+            part_news_info_list = self.__miningOnePage()
+            # [news_info for news_info in part_news_info_list if news_info.getPubDateTime() >= since_datetime]
+            filtered_part_news_info_list = NewsInfoHelper.filterByInterval(part_news_info_list, since_date, until_date)
+            news_info_list.extend(filtered_part_news_info_list)
+
+            earliest_news_info = part_news_info_list[-1]
+            earliest_pub_datetime = earliest_news_info.getPubDateTime()
+            if(NewsInfoHelper.checkIsAfterEqSinceDate(earliest_news_info, since_date) == False):
+                break
+        return news_info_list
+            
     def __doSetupNowUrl(self):
-        self.__now_url = self.__url_pattern.replace(
-            '${PAGE}', str(self.__now_page))
+        self.__now_url = self.__url_pattern.replace('${PAGE}', str(self.__now_page))
         # print(self._now_url)
         self.__now_page += 1
 
@@ -400,8 +430,7 @@ class BitCoinComNewsClient(PaginationClient):
             self.__now_url, params=params)  # 目前花時最多的
 
         # data-desc='新聞列表' > class='searchlist' > li
-        news_element_list = html_parsed_data.find(
-            "div", class_='td-main-content').findAll(class_='td-animation-stack')  # 新聞(標題)清單
+        news_element_list = html_parsed_data.find("div", class_='td-main-content').findAll(class_='td-animation-stack')  # 新聞(標題)清單
         for news_element in news_element_list:
             news_info = self.__obtainNewsInfo(news_element)
             part_news_info_list.append(news_info)
@@ -518,6 +547,16 @@ class NewsCrawler:
 
     def getClientDict(self):
         return self.__client_dict
+
+    def findByInterval(self, since_date, until_date, close_after_iter=True):
+        all_news_info_list = []
+        client_list = list(self.__client_dict.values())
+        for client in client_list:
+            news_info_list = client.findByInterval(since_date, until_date)
+            all_news_info_list.extend(news_info_list)
+            if close_after_iter == True:
+                client.close()
+        return all_news_info_list
 
     def findBySinceDate(self, since_date, close_after_iter=True):
         all_news_info_list = []
