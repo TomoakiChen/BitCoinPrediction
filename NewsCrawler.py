@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#import datetime #https://stackoverflow.com/questions/50639415/attributeerror-module-datetime-has-no-attribute-now 這個用起來有點問題，換下面的
+# import datetime #https://stackoverflow.com/questions/50639415/attributeerror-module-datetime-has-no-attribute-now 這個用起來有點問題，換下面的
 from datetime import datetime, date, timedelta
 from AkiPyDateTime import AkiDateTimeUtil
 from PyWeb import HtmlClient, WebDriverClient
@@ -8,44 +8,48 @@ from selenium.webdriver.common.by import By
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
+
 class PaginationClient(HtmlClient):
 
     def __init__(self):
-        pass
+        super().__init__()
+
 
 class AjaxRefreshClient(WebDriverClient):
 
-    def __init__(self):
-        pass
-
+    def __init__(self, browser_less=True, console_log_less=True):
+        super().__init__(browser_less=browser_less, console_log_less=console_log_less)
 
 
 class NewsInfoHelper:
     @staticmethod
     def filterBySincaDate(ori_news_info_list, since_date):
         since_datetime = datetime.combine(since_date, datetime.min.time())
-        filtered_news_info_list = [news_info for news_info in ori_news_info_list if news_info.getPubDateTime() != None and news_info.getPubDateTime().timestamp() >= since_datetime.timestamp()]
+        filtered_news_info_list = [news_info for news_info in ori_news_info_list if news_info.getPubDateTime(
+        ) != None and news_info.getPubDateTime().timestamp() >= since_datetime.timestamp()]
         return filtered_news_info_list
 
     @staticmethod
-    def checkIsAfterEqSinceDate(news_info, since_date = None):
+    def checkIsAfterEqSinceDate(news_info, since_date=None):
         pub_datetime = news_info.getPubDateTime()
         return AkiDateTimeUtil.checkIsAfterEqSinceDate(pub_datetime, since_date)
 
     @staticmethod
-    def checkIsBeforeEqUntilDate(news_info, until_date = None):
+    def checkIsBeforeEqUntilDate(news_info, until_date=None):
         pub_datetime = news_info.getPubDateTime()
         return AkiDateTimeUtil.checkIsBeforeEqUntilDate(pub_datetime, since_date)
 
     @staticmethod
-    def checkIsInInterval(news_info, since_date = None, until_date = None):
+    def checkIsInInterval(news_info, since_date=None, until_date=None):
         pub_datetime = news_info.getPubDateTime()
         return AkiDateTimeUtil.checkIsInInterval(pub_datetime, since_date, until_date)
+
 
 class NewsCrawlerHelper:
     @staticmethod
     def needStopMining(news_info_list, filtered_news_info_list):
         return len(filtered_news_info_list) != len(news_info_list)
+
 
 class LTNNewsClient(PaginationClient):
 
@@ -53,7 +57,7 @@ class LTNNewsClient(PaginationClient):
         super().__init__()
         self.__url_pattern = 'https://news.ltn.com.tw/topic/%E6%AF%94%E7%89%B9%E5%B9%A3/${PAGE}'
         # self.__news_since = None # news_since
-        self.__news_until = None # news_until
+        self.__news_until = None  # news_until
 
         self.__now_url = None
         self.__now_page = 1
@@ -69,34 +73,37 @@ class LTNNewsClient(PaginationClient):
             news_info_list.extend(part_news_info_list)
         return news_info_list
 
-    def findBySinceDate(self, since_date = date.today()):
+    def findBySinceDate(self, since_date=date.today()):
         news_info_list = []
         # since_datetime = datetime.combine(since_date, datetime.min.time())
         while True:
             part_news_info_list = self.__miningOnePage()
-            filtered_part_news_info_list = NewsInfoHelper.filterBySincaDate(part_news_info_list, since_date) # [news_info for news_info in part_news_info_list if news_info.getPubDateTime() >= since_datetime]
+            # [news_info for news_info in part_news_info_list if news_info.getPubDateTime() >= since_datetime]
+            filtered_part_news_info_list = NewsInfoHelper.filterBySincaDate(
+                part_news_info_list, since_date)
             news_info_list.extend(filtered_part_news_info_list)
 
             if len(filtered_part_news_info_list) != len(part_news_info_list):
-                break;
+                break
         return news_info_list
 
     def findByInterval(self,):
         pass
 
-
     def __doSetupNowUrl(self):
-        self.__now_url = self.__url_pattern.replace('${PAGE}', str(self.__now_page) )
-        #print(self._now_url)
+        self.__now_url = self.__url_pattern.replace(
+            '${PAGE}', str(self.__now_page))
+        # print(self._now_url)
         self.__now_page += 1
 
     def __miningOnePage(self):
         part_news_info_list = []
         self.__doSetupNowUrl()
-        html_parsed_data = self.getHtml(self.__now_url) #目前花時最多的
+        html_parsed_data = self.getHtml(self.__now_url)  # 目前花時最多的
 
         # data-desc='新聞列表' > class='searchlist' > li
-        news_element_list = html_parsed_data.find(class_='searchlist').findAll('li') #新聞(標題)清單
+        news_element_list = html_parsed_data.find(
+            class_='searchlist').findAll('li')  # 新聞(標題)清單
         for news_element in news_element_list:
             news_info = self.__obtainNewsInfo(news_element)
             part_news_info_list.append(news_info)
@@ -108,7 +115,7 @@ class LTNNewsClient(PaginationClient):
             try:
                 return datetime.strptime(str_pub_datetime, pub_datetime_format)
             except ValueError:
-                pass # Do Nothing
+                pass  # Do Nothing
         return None
 
     def __obtainNewsInfo(self, news_element):
@@ -120,16 +127,17 @@ class LTNNewsClient(PaginationClient):
         news_info.setPubDateTime(self.__obtainPubDateTime(str_pub_datetime))
 
         title_link_element = news_element.find("a", class_="tit")
-        news_info.setLink(title_link_element['href']) #新聞連結
-        news_info.setTitle(title_link_element.find('h3').getText()) #新聞標題
+        news_info.setLink(title_link_element['href'])  # 新聞連結
+        news_info.setTitle(title_link_element.find('h3').getText())  # 新聞標題
 
         return news_info
     # ============================ 上面跟 NewsInfo 有關 ============================
 
+
 class YahooNewsClient(AjaxRefreshClient):
 
-    def __init__(self, url='https://tw.news.yahoo.com/tag/比特幣', headless=True):
-        super().__init__(headless=headless)
+    def __init__(self, url='https://tw.news.yahoo.com/tag/比特幣', browser_less=True):
+        super().__init__(browser_less=browser_less)
         self.__url = url
 
         self.__now_page = 0
@@ -144,7 +152,8 @@ class YahooNewsClient(AjaxRefreshClient):
 
     def __doReadyLoadPage(self):
         self._browser_driver.get(self.__url)
-        container_element = self._browser_driver.find_element(By.TAG_NAME, 'body')
+        container_element = self._browser_driver.find_element(
+            By.TAG_NAME, 'body')
         actions = webdriver.ActionChains(self._browser_driver)
         actions.click(container_element)
         actions.perform()
@@ -168,16 +177,17 @@ class YahooNewsClient(AjaxRefreshClient):
         news_info = NewsInfo()
         link_element = news_element.find("a", class_="mega-item-header-link")
         link_url = link_element['href']
-        text = link_element.getText() #此method會忽略掉 註解和tag
+        text = link_element.getText()  # 此method會忽略掉 註解和tag
 
         news_info.setTitle(text)
         news_info.setLink(link_url)
         return news_info
 
+
 class cnYESNewsClient(AjaxRefreshClient):
 
-    def __init__(self, url='https://www.cnyes.com/search/news?keyword=比特幣', headless=True):
-        super().__init__(headless=headless)
+    def __init__(self, url='https://www.cnyes.com/search/news?keyword=比特幣', browser_less=True):
+        super().__init__(browser_less=browser_less)
         self.__url = url
         self.__now_page = 0
 
@@ -214,7 +224,8 @@ class cnYESNewsClient(AjaxRefreshClient):
 
     def __doReadyLoadPage(self):
         self._browser_driver.get(self.__url)
-        container_element = self._browser_driver.find_element(By.TAG_NAME, 'body')
+        container_element = self._browser_driver.find_element(
+            By.TAG_NAME, 'body')
         actions = webdriver.ActionChains(self._browser_driver)
         actions.click(container_element)
         actions.perform()
@@ -229,9 +240,9 @@ class cnYESNewsClient(AjaxRefreshClient):
 
         news_info_list = []
         # '[id="__SearchAll"]'(搜尋結果外框) > a[class="news"] (每一條新聞)
-        news_element_list = parsed_data.find(id="_SearchAll").findAll("a", class_='news')
+        news_element_list = parsed_data.find(
+            id="_SearchAll").findAll("a", class_='news')
         return news_element_list
-
 
     def __obtainNewsInfo(self, news_element):
         news_info = NewsInfo()
@@ -251,13 +262,14 @@ class cnYESNewsClient(AjaxRefreshClient):
         news_info.setPubDateTime(pub_datetime)
         return news_info
 
+
 """
 經濟日報
 """
-class MoneyUdnNewsClient(WebDriverClient):
+class MoneyUdnNewsClient(AjaxRefreshClient):
 
-    def __init__(self, url='https://money.udn.com/search/result/1001/比特幣', headless=True):
-        super().__init__(headless=headless)
+    def __init__(self, url='https://money.udn.com/search/result/1001/比特幣', browser_less=True):
+        super().__init__(browser_less=browser_less)
         self.__url = url
 
         self.__now_page = 0
@@ -284,7 +296,7 @@ class MoneyUdnNewsClient(WebDriverClient):
             earliest_news_element = news_element_list[-1]
             earliest_news_info = self.__obtainNewsInfo(earliest_news_element)
             print("earliest_news_info = " + str(earliest_news_info))
-            print ("since_date = " + str(since_date))
+            print("since_date = " + str(since_date))
             if(NewsInfoHelper.checkIsAfterEqSinceDate(earliest_news_info, since_date) == False):
                 for news_element in news_element_list:
                     news_info = self.__obtainNewsInfo(news_element)
@@ -293,12 +305,10 @@ class MoneyUdnNewsClient(WebDriverClient):
                 break
         return news_info_list
 
-
-
-
     def __doReadyLoadPage(self):
         self._browser_driver.get(self.__url)
-        container_element = self._browser_driver.find_element(By.TAG_NAME, 'body')
+        container_element = self._browser_driver.find_element(
+            By.TAG_NAME, 'body')
         actions = webdriver.ActionChains(self._browser_driver)
         actions.click(container_element)
         actions.perform()
@@ -319,13 +329,16 @@ class MoneyUdnNewsClient(WebDriverClient):
 
     def __obtainNewsInfo(self, news_element):
         news_info = NewsInfo()
-        story_content_element = news_element.find("div", class_="story__content")
+        story_content_element = news_element.find(
+            "div", class_="story__content")
 
         time_element = story_content_element.find("time")
         str_pub_datetime = time_element.getText()
 
-        title_element = story_content_element.find("h3", class_="story__headline")
-        title = title_element.getText().strip() # 此網頁會將搜尋的字眼化底線...(會多一個 <u></u>) --> 不曉得是不是自動處理掉了，反而是要處理前後空白
+        title_element = story_content_element.find(
+            "h3", class_="story__headline")
+        # 此網頁會將搜尋的字眼化底線...(會多一個 <u></u>) --> 不曉得是不是自動處理掉了，反而是要處理前後空白
+        title = title_element.getText().strip()
 
         link_element = story_content_element.find("a")
         link_url = link_element["href"]
@@ -335,12 +348,13 @@ class MoneyUdnNewsClient(WebDriverClient):
         # news_info.setPubDateTime(pub_datetime)
         return news_info
 
+
 class BitCoinComNewsClient(PaginationClient):
     def __init__(self):
         super().__init__()
         # self.__url_pattern = 'https://news.bitcoin.com/page/${PAGE}/?s=Bitcoin'
         self.__url_pattern = 'https://news.bitcoin.com/page/${PAGE}/'
-        self.__news_until = None # news_until
+        self.__news_until = None  # news_until
 
         self.__now_url = None
         self.__now_page = 1
@@ -355,24 +369,25 @@ class BitCoinComNewsClient(PaginationClient):
             news_info_list.extend(part_news_info_list)
         return news_info_list
 
-    def findBySinceDate(self, since_date = date.today()):
+    def findBySinceDate(self, since_date=date.today()):
         news_info_list = []
         since_datetime = datetime.combine(since_date, datetime.min.time())
         while True:
             part_news_info_list = self.__miningOnePage()
-            filtered_part_news_info_list = NewsInfoHelper.filterBySincaDate(part_news_info_list, since_date)
+            filtered_part_news_info_list = NewsInfoHelper.filterBySincaDate(
+                part_news_info_list, since_date)
             news_info_list.extend(filtered_part_news_info_list)
             if len(filtered_part_news_info_list) != len(part_news_info_list):
-                break;
+                break
         return news_info_list
 
     def findByInterval(self):
         pass
 
-
     def __doSetupNowUrl(self):
-        self.__now_url = self.__url_pattern.replace('${PAGE}', str(self.__now_page) )
-        #print(self._now_url)
+        self.__now_url = self.__url_pattern.replace(
+            '${PAGE}', str(self.__now_page))
+        # print(self._now_url)
         self.__now_page += 1
 
     def __miningOnePage(self):
@@ -381,10 +396,12 @@ class BitCoinComNewsClient(PaginationClient):
         self.__doSetupNowUrl()
         # s=Bitcoin
         params = {"s": "Bitcoin"}
-        html_parsed_data = self.getHtml(self.__now_url, params=params) #目前花時最多的
+        html_parsed_data = self.getHtml(
+            self.__now_url, params=params)  # 目前花時最多的
 
         # data-desc='新聞列表' > class='searchlist' > li
-        news_element_list = html_parsed_data.find("div", class_='td-main-content').findAll(class_='td-animation-stack') #新聞(標題)清單
+        news_element_list = html_parsed_data.find(
+            "div", class_='td-main-content').findAll(class_='td-animation-stack')  # 新聞(標題)清單
         for news_element in news_element_list:
             news_info = self.__obtainNewsInfo(news_element)
             part_news_info_list.append(news_info)
@@ -395,7 +412,7 @@ class BitCoinComNewsClient(PaginationClient):
             try:
                 return datetime.strptime(str_pub_datetime, pub_datetime_format)
             except ValueError:
-                pass # Do Nothing
+                pass  # Do Nothing
         return None
 
     def __obtainNewsInfo(self, news_element):
@@ -407,7 +424,8 @@ class BitCoinComNewsClient(PaginationClient):
         link_url = link_element["href"]
         title = link_element.getText()
 
-        meta_info_element = items_detail_element.find(class_="td-module-meta-info")
+        meta_info_element = items_detail_element.find(
+            class_="td-module-meta-info")
         datetime_eleent = meta_info_element.find("time", class_="entry-date")
         str_pub_datetime = datetime_eleent["datetime"]
         pub_datetime = datetime.fromisoformat(str_pub_datetime)
@@ -417,12 +435,14 @@ class BitCoinComNewsClient(PaginationClient):
         news_info.setPubDateTime(pub_datetime)
         return news_info
 
+
 class CNBCNewsClient(AjaxRefreshClient):
 
-    def __init__(self, url='https://www.cnbc.com/search/?query=Bitcoin&qsearchterm=Bitcoin', headless=True):
-        super().__init__(headless=headless)
+    def __init__(self, url='https://www.cnbc.com/search/?query=Bitcoin&qsearchterm=Bitcoin', browser_less=True):
+        super().__init__(browser_less=browser_less)
         self.__url = url
         self.__now_page = 0
+
 
 class NewsCrawler:
     """
@@ -442,11 +462,11 @@ class NewsCrawler:
     #   "Bitcoin.com": BitCoinComNewsClient()
     # }
     __client_clazz_dict = {
-      "LTN": LTNNewsClient,
-      "Yahoo": YahooNewsClient,
-      "cnYES": cnYESNewsClient,
-      "MoneyUdn": MoneyUdnNewsClient,
-      "Bitcoin.com": BitCoinComNewsClient
+        "LTN": LTNNewsClient,
+        "Yahoo": YahooNewsClient,
+        "cnYES": cnYESNewsClient,
+        "MoneyUdn": MoneyUdnNewsClient,
+        "Bitcoin.com": BitCoinComNewsClient
     }
     __client_dict = dict()
 
@@ -476,16 +496,16 @@ class NewsCrawler:
                 client.close()
         return all_news_info_list
     """
+
     def __init__(self, news_sources=None):
         self.__setupClientDict(news_sources)
 
     def __obtainClient(self, client_clazz):
         return client_clazz()
 
-
     def __setupClientDict(self, news_sources):
         if news_sources == None:
-            news_sources = list(self.__client_clazz_dict.keys() )
+            news_sources = list(self.__client_clazz_dict.keys())
 
         for news_code in news_sources:
             client_clazz = self.__client_clazz_dict.get(news_code)
@@ -496,9 +516,12 @@ class NewsCrawler:
             else:
                 print("[Warning] Cannot found client_clazz by [" + news_code + "]")
 
-    def findBySinceDate(self, since_date, close_after_iter = True):
+    def getClientDict(self):
+        return self.__client_dict
+
+    def findBySinceDate(self, since_date, close_after_iter=True):
         all_news_info_list = []
-        client_list = list(self.__client_dict.values() )
+        client_list = list(self.__client_dict.values())
         for client in client_list:
             news_info_list = client.findBySinceDate(since_date)
             all_news_info_list.extend(news_info_list)
@@ -506,19 +529,19 @@ class NewsCrawler:
                 client.close()
         return all_news_info_list
 
-
     def closeAll(self):
-        client_list = list(self.__client_dict.values() )
+        client_list = list(self.__client_dict.values())
         for client in client_list:
             client.close()
 
+
 class NewsCsvCrawler(NewsCrawler):
 
-    def __init__(self, news_sources = None):
+    def __init__(self, news_sources=None):
         super().__init__(news_sources)
 
-
     def save2Csv(self, since_date, days_freq=7):
+        """
         news_info_list = list()
         now_since_date = date.today()
         the_timedelta = timedelta(days=days_freq)
@@ -535,3 +558,4 @@ class NewsCsvCrawler(NewsCrawler):
             if now_since_date == since_date:
                 self.closeAll()
                 break
+        """

@@ -78,22 +78,23 @@ class HtmlClient:
 # ============================================================================================================================================
 class WebDriverClient:
     # _auto_load_website_actions_ =
-    def __init__(self, driver_type='Chrome', headless=False):
-        #print("driver_type= ", driver_type, ",headless= ", headless)
-        self._browser_driver = self.__setupBrowserDriver(driver_type, headless)
+    def __init__(self, driver_type='Chrome', browser_less=False, console_log_less=False):
+        self._browser_driver = self.__setupBrowserDriver(driver_type, browser_less, console_log_less)
 
-    def __setupBrowserDriver(self, driver_type, headless):
+    def __setupBrowserDriver(self, driver_type, browser_less, console_log_less):
         if driver_type == 'Chrome':
             op = webdriver.ChromeOptions()
-            if headless:
+            if browser_less:
                 # 這樣可以不用打開實際的瀏覽器 https://stackoverflow.com/questions/7593611/selenium-testing-without-browser
                 op.add_argument('headless')
+
+            if console_log_less:
                 op.add_argument("--log-level=3")
             return webdriver.Chrome(options=op)
         elif driver_type == 'Firefox':
             return webdriver.Firefox()
         else:
-            return webdriver.Chrome()
+            return self.__setupBrowserDriver('Chrome', browser_less, console_log_less)
 
     def getHtml(self, url, action_chains=None):
         # self._browser_driver.get(url)

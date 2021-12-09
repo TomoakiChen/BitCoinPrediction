@@ -38,7 +38,7 @@ class PandasDataFrameHelper:
                 col_value = dictInfo.get(desig_col)
                 col_values.append(col_value)
             col_values_dict[desig_col] = col_values
-        return col_values_dict
+        return pd.DataFrame(col_values_dict)
 
     @staticmethod
     def __obtainDictColList(dictList):
