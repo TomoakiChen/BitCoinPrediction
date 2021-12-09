@@ -4,12 +4,14 @@ from PandasHelper import PandasDataFrameHelper
 from NewsInfo import NewsInfoHelper
 
 # sources = ["LTN", "cnYES", "MoneyUdn", "Bitcoin.com"]
-sources = ["LTN", "cnYES", "Bitcoin.com"]
+# sources = ["LTN", "cnYES", "Bitcoin.com"]
 # sources = ["cnYES", "MoneyUdn"]
+sources = ["LTN", "Bitcoin.com"]
 start = datetime.now()
 crawler = NewsCrawler(news_sources=sources)
-since_date = date.fromisoformat('2021-10-01')
-news_list = crawler.findBySinceDate(since_date)
+since_date = date.fromisoformat('2021-01-01')
+until_date = date.fromisoformat('2021-05-31')
+news_list = crawler.findByInterval(since_date, until_date)
 end = datetime.now()
 
 # for news in news_list:
@@ -17,7 +19,7 @@ end = datetime.now()
 # print("total nums = ", len(news_list))
 # print("cost = ", (end - start))
 df = NewsInfoHelper.parseInfoList2DataFrame(news_list, desig_col_list=["pubDateTime", "title"])
-df.to_csv('./NewsInfo.csv', index=False)
+df.to_csv('./NewsInfo_' + str(since_date) + "-" + str(until_date) +   '.csv', index=False)
 # PandasDataFrameHelper.parseObjectList2DataFrame(news_list)
 
 # --------------------------------- 以下是 自由時報格式 ---------------------------------
