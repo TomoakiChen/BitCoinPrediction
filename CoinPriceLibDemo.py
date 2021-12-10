@@ -11,9 +11,11 @@ def tryFindNoData(df, timedelta):
         if data.empty == True:
             print("missing data for date = " + str(now) )
         else:
-            if(len(data) >= 2):
-                print("duplicate value for date = " + str(now))
-                print(data)
+            nums_of_data = len(data)
+            if(nums_of_data >= 2):
+                pass
+                print("duplicate data for date = " + str(now) + " nums = " +  str(nums_of_data))
+                # print(data)
         now = now + timedelta
 
 
