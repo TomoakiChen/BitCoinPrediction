@@ -2,6 +2,7 @@ import pandas as pd
 import urllib
 from datetime import date as DateUtils
 from datetime import datetime as DateTimeUtils
+from datetime import timedelta
 from PandasHelper import PandasDataFrameHelper
 import numpy
 
@@ -39,39 +40,21 @@ class CryptoDatadownloadBinaceClient:
         df["date"] = date_datas
         return df
 
-    def _filteringeDateRange(self, df, since, until):
-        if since == None and until == None:
-            return df
-        elif since != None and until == None:
-            if isinstance(since, DateUtils) or isinstance(since, DateTimeUtils):
-                since = str(since)
-            return df[(df['date'] >= since)]
-        elif since == None and until != None:
-            if isinstance(until, DateUtils) or isinstance(until, DateTimeUtils):
-                until = str(until)
-            return df[(df['date'] <= until)]
-        else:
-            if isinstance(since, DateUtils) or isinstance(since, DateTimeUtils):
-                since = str(since)
-            if isinstance(until, DateUtils) or isinstance(until, DateTimeUtils):
-                until = str(until)
-            print("type of since = " + str(type(since)))
-            print("type of until = " + str(type(until)))
-            return df[(df['date'] >= since & df['date'] <= until)]
-
     # ==================================================== 以下是 csv初始的 DataFrame 格式 ====================================================
-    def getDailyDataFrame(self, desig_col_list=None, since=None, until=None):
+    def getDailyDataFrame(self, desig_col_list=None, since=None, until=None, sort_by_date=True, asc_by_date=True):
         # 第一行是 CryptoDatadownload 的標註
         df = self._readCsv(self.__url_dict.get('Daily'))
-        df = self._filteringeDateRange(df, since, until)
+        df = CrpytoDatadownloadBinanceDataHelper.filteringDateRange(df, since, until)
+        df = CrpytoDatadownloadBinanceDataHelper.sortingDate(df, sort_by_date, asc_by_date)
         if desig_col_list == None:
             return df
         else:
             return df[desig_col_list]
 
-    def getHourlyDataFrame(self, desig_col_list=None, since=None, until=None):
+    def getHourlyDataFrame(self, desig_col_list=None, since=None, until=None, sort_by_date=True, asc_by_date=True):
         df = self._readCsv(self.__url_dict.get('Hourly'))
-        df = self._filteringeDateRange(df, since, until)
+        df = CrpytoDatadownloadBinanceDataHelper.filteringDateRange(df, since, until)
+        df = CrpytoDatadownloadBinanceDataHelper.sortingDate(df, sort_by_date, asc_by_date)
         if desig_col_list == None:
             return df
         else:
@@ -137,6 +120,44 @@ class CryptoDatadownloadBinaceClient:
     """
     # ==================================================== 以上是 Numpy 格式 ====================================================
 
+# ========================================================= 以下輔佐對 CryptoDatadownloadBinace 資料的操作
+class CrpytoDatadownloadBinanceDataHelper:
+    @staticmethod
+    def filteringDateRange(df, since, until):
+        if since == None and until == None:
+            return df
+        elif since != None and until == None:
+            if isinstance(since, DateUtils) or isinstance(since, DateTimeUtils):
+                since = str(since)
+            return df[(df['date'] >= since)]
+        elif since == None and until != None:
+            if isinstance(until, DateUtils) or isinstance(until, DateTimeUtils):
+                until = str(until)
+            return df[(df['date'] <= until)]
+        else:
+            if isinstance(since, DateUtils) or isinstance(since, DateTimeUtils):
+                since = str(since)
+            if isinstance(until, DateUtils) or isinstance(until, DateTimeUtils):
+                until = str(until)
+            # print("type of since = " + str(type(since)))
+            # print("type of until = " + str(type(until)))
+            return df[(df['date'] >= since & df['date'] <= until)]
+
+    @staticmethod
+    def sortingDate(df, sort_by_date, asc_by_date):
+        if sort_by_date == True:
+            df = df.sort_values(by="date", ascending=asc_by_date, ignore_index=True)
+        return df
+
+
+    @staticmethod
+    def fillEmpty(df, fill_in_method):
+        if fill_in_method != None:
+            df = df.interpolate(method=fill_in_method, inplace=True)
+        return df
+
+#
+
 
 # ========================================================= 以下 輔佐將 csv data 轉換 =========================================================
 class CryptoDatadownloadBinaceCsvDataParser:
@@ -190,7 +211,7 @@ class CryptoDatadownloadBinaceCsvDataParser:
 # ========================================================= 以上 輔佐將 csv data 轉換 =========================================================
 
 
-# ========================================================= 以下 轉換 =========================================================
+# ========================================================= 以下 利用指定區間將資料分組 =========================================================
 class PeriodlyCoinPriceInfo:
 
     _period_col = None
@@ -248,7 +269,7 @@ class PeriodlyCoinPriceInfo:
 
     def getAllPriceList(self):
         return list(self._period_price_list_dict.values())
-# ========================================================= 以上 轉換 =========================================================
+# ========================================================= 以上 利用指定區間將資料分組 =========================================================
 
 
 # ========================================================= 以下 一些財經相關的算式(?)的methods =========================================================

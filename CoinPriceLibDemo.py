@@ -1,7 +1,36 @@
-from CoinPriceLib import CryptoDatadownloadBinaceClient
+from CoinPriceLib import CryptoDatadownloadBinaceClient, CrpytoDatadownloadBinanceDataHelper
 import pandas as pd
+from datetime import datetime, timedelta
+
+def tryFindNoData(df, timedelta):
+    since = df["date"][0]
+    until = df["date"][len(df)-1]
+    now = since
+    while(now <= until):
+        data = df[df["date"] == now]
+        if data.empty == True:
+            print("missing data for date = " + str(now) )
+        else:
+            if(len(data) >= 2):
+                print("duplicate value for date = " + str(now))
+                print(data)
+        now = now + timedelta
+
 
 client = CryptoDatadownloadBinaceClient()
+
+df = client.getHourlyDataFrame(desig_col_list=["date", "close"])
+hourly_time_delta = timedelta(hours=1)
+# print(df)
+# print(df["date"][0])
+# print(df[df["date"] == datetime.fromisoformat("2021-12-10 00:00:00")])
+tryFindNoData(df, hourly_time_delta)
+
+
+
+
+# df = CrpytoDatadownloadBinanceDataHelper.fillEmpty(df, 'pad')
+# print(df)
 
 """
 df = client.getDailyDataFrame()
