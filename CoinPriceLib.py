@@ -120,6 +120,8 @@ class CryptoDatadownloadBinaceClient:
     """
     # ==================================================== 以上是 Numpy 格式 ====================================================
 
+
+
 # ========================================================= 以下輔佐對 CryptoDatadownloadBinace 資料的操作
 class CrpytoDatadownloadBinanceDataHelper:
     @staticmethod
@@ -155,8 +157,8 @@ class CrpytoDatadownloadBinanceDataHelper:
         if fill_in_method != None:
             df = df.interpolate(method=fill_in_method, inplace=True)
         return df
+# ========================================================= 以上輔佐對 CryptoDatadownloadBinace 資料的操作
 
-#
 
 
 # ========================================================= 以下 輔佐將 csv data 轉換 =========================================================
@@ -209,6 +211,7 @@ class CryptoDatadownloadBinaceCsvDataParser:
             date_time = pd.to_datetime(str_date_time) # DateTimeUtils.strptime("%Y-%m-%d %H:%M:%S", str_date_time)
         return date_time
 # ========================================================= 以上 輔佐將 csv data 轉換 =========================================================
+
 
 
 # ========================================================= 以下 利用指定區間將資料分組 =========================================================
@@ -270,6 +273,7 @@ class PeriodlyCoinPriceInfo:
     def getAllPriceList(self):
         return list(self._period_price_list_dict.values())
 # ========================================================= 以上 利用指定區間將資料分組 =========================================================
+
 
 
 # ========================================================= 以下 一些財經相關的算式(?)的methods =========================================================
