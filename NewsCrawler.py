@@ -414,7 +414,7 @@ class BitCoinComNewsClient(PaginationClient):
             if(NewsInfoHelper.checkIsAfterEqSinceDate(earliest_news_info, since_date) == False):
                 break
         return news_info_list
-            
+
     def __doSetupNowUrl(self):
         self.__now_url = self.__url_pattern.replace('${PAGE}', str(self.__now_page))
         # print(self._now_url)
