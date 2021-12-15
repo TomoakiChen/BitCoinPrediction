@@ -9,15 +9,21 @@ def tryFindNoData(df, timedelta):
     while(now <= until):
         data = df[df["date"] == now]
         if data.empty == True:
-            print("missing data for date = " + str(now) )
+            # print("missing data for date = " + str(now) )
+            new_data_4_df = pd.Series({"date": now, "close": None})
+            df = df.append(new_data_4_df, ignore_index=True)
         else:
             nums_of_data = len(data)
             if(nums_of_data >= 2):
-                pass
-                print("duplicate data for date = " + str(now) + " nums = " +  str(nums_of_data))
+                # print("duplicate data for date = " + str(now) + " nums = " +  str(nums_of_data))
                 # print(data)
+                mean_data = data.mean(numeric_only=None)
+                new_data_4_df = pd.Series({"date": now, "close": mean_data["close"]})
+                df = df.drop(list(data.index) )
+                df = df.append(new_data_4_df, ignore_index=True)
         now = now + timedelta
-
+    print(df)
+    print(CrpytoDatadownloadBinanceDataHelper.filteringDateRange(df, datetime.fromisoformat('2020-11-20 07:00:00'), datetime.fromisoformat('2020-11-20 07:00:00') ))
 
 client = CryptoDatadownloadBinaceClient()
 
@@ -26,10 +32,12 @@ hourly_time_delta = timedelta(hours=1)
 # print(df)
 # print(df["date"][0])
 # print(df[df["date"] == datetime.fromisoformat("2021-12-10 00:00:00")])
-tryFindNoData(df, hourly_time_delta)
+# tryFindNoData(df, hourly_time_delta)
 
-
-
+df = CrpytoDatadownloadBinanceDataHelper.fillingMissingData(df, hourly_time_delta)
+# print(df)
+print(df[df["date"] == datetime.fromisoformat("2020-11-30 06:00:00")])
+print(df[df["date"] == datetime.fromisoformat("2020-11-20 07:00:00")])
 
 # df = CrpytoDatadownloadBinanceDataHelper.fillEmpty(df, 'pad')
 # print(df)

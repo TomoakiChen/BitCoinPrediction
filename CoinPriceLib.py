@@ -143,7 +143,7 @@ class CrpytoDatadownloadBinanceDataHelper:
                 until = str(until)
             # print("type of since = " + str(type(since)))
             # print("type of until = " + str(type(until)))
-            return df[(df['date'] >= since & df['date'] <= until)]
+            return df[(df['date'] >= since) & (df['date'] <= until)]
 
     @staticmethod
     def sortingDate(df, sort_by_date, asc_by_date):
@@ -153,9 +153,42 @@ class CrpytoDatadownloadBinanceDataHelper:
 
 
     @staticmethod
-    def fillEmpty(df, fill_in_method):
+    def fillingMissingData(df, abs_desig_timedelta, fill_in_method='linear'):
+        since = df["date"][0]
+        until = df["date"][len(df)-1]
+        asc_by_date = None
+        if until >= since:
+            asc_by_date = True
+        else:
+            asc_by_date = False
+
+        desig_datetime = since
+        while(desig_datetime <= until):
+            data = df[df["date"] == desig_datetime]
+            if data.empty == True:
+                # print("missing data for date= " + str(desig_datetime) )
+                new_data_4_df = pd.Series({"date": desig_datetime, "close": None})
+                df = df.append(new_data_4_df, ignore_index=True)
+            else:
+                nums_of_data = len(data)
+                if(nums_of_data >= 2):
+                    # print("duplicate data for date(index=" + str(data.index) +  ") = " + str(desig_datetime) + " nums = " +  str(nums_of_data))
+                    # print(data)
+                    mean_data = data.mean(numeric_only=None)
+                    new_data_4_df = pd.Series({"date": desig_datetime, "close": mean_data["close"]})
+                    df = df.drop(data.index)
+                    df = df.append(new_data_4_df, ignore_index=True)
+            if asc_by_date:
+                desig_datetime = desig_datetime + abs_desig_timedelta
+            else:
+                desig_datetime = desig_datetime - abs_desig_timedelta
+
+        df = CrpytoDatadownloadBinanceDataHelper.sortingDate(df, True, asc_by_date)
+
+        print(df["close"][28825:28827])
         if fill_in_method != None:
-            df = df.interpolate(method=fill_in_method, inplace=True)
+            df["close"].interpolate(method=fill_in_method, inplace=True)
+        print(df["close"][28825:28827])
         return df
 # ========================================================= 以上輔佐對 CryptoDatadownloadBinace 資料的操作
 
