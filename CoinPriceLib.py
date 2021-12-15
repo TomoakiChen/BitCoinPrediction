@@ -185,10 +185,9 @@ class CrpytoDatadownloadBinanceDataHelper:
 
         df = CrpytoDatadownloadBinanceDataHelper.sortingDate(df, True, asc_by_date)
 
-        print(df["close"][28825:28827])
         if fill_in_method != None:
             df["close"].interpolate(method=fill_in_method, inplace=True)
-        print(df["close"][28825:28827])
+            # df.astype(float).interpolate(method=fill_in_method, inplace=True)
         return df
 # ========================================================= 以上輔佐對 CryptoDatadownloadBinace 資料的操作
 

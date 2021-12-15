@@ -35,7 +35,7 @@ hourly_time_delta = timedelta(hours=1)
 # tryFindNoData(df, hourly_time_delta)
 
 df = CrpytoDatadownloadBinanceDataHelper.fillingMissingData(df, hourly_time_delta)
-# print(df)
+print(df)
 print(df[df["date"] == datetime.fromisoformat("2020-11-30 06:00:00")])
 print(df[df["date"] == datetime.fromisoformat("2020-11-20 07:00:00")])
 
