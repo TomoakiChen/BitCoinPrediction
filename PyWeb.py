@@ -45,8 +45,8 @@ class HttpClient:
 
     def sendGetRequest(self, url, encoded="utf-8", user_headers=None, queryParams=None):
         headers = self._obtainHeaders(user_headers)
-        print("url = " + url)
-        print("headers = " + str(headers))        
+        # print("url = " + url)
+        # print("headers = " + str(headers))
         url = self._processGetRequestUrl(url, queryParams)
         URL = req.Request(url, headers=headers)
         with req.urlopen(URL) as res:
