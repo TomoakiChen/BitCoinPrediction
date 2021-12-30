@@ -1,5 +1,6 @@
+# https://www.metals-api.com/documentation
 from PyWeb import HttpClient
-import MatalPrice.MetalsAPI.Entity as MetalsAPIEntity
+import MetalPrice.MetalsAPI.Entity as MetalsAPIEntity
 from datetime import datetime, date
 import ssl
 import json
@@ -36,7 +37,8 @@ class MatalsAPIClient(HttpClient):
         query_params = self.__obtainBaseQueryParams()
         if user_query_params != None:
             query_params.update(user_query_params)
-        print(query_params)
+        print("url= " + url)
+        print("query_params= " + str(query_params) )
         str_json = self.sendGetRequest(url, queryParams=query_params)
         return str_json
 

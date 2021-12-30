@@ -1,4 +1,4 @@
-from MatalPrice.MetalsAPI.Client import MatalsAPIClient, GoldPriceClient
+from MetalPrice.MetalsAPI.Client import MatalsAPIClient, GoldPriceClient
 
 client = MatalsAPIClient("b7aujpu9wa73t64sx0p4gwiragdv1pziw6029efu8n52xgm87hbcqq632o9l")
 # symbol_data = client.getDesigCurrencySymbolDataByCode("XAU")
