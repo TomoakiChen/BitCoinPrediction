@@ -15,6 +15,7 @@ class GoldAPIClient(HttpClient):
         self.__api_key = api_key
         self.__base_url = base_url
         self.__doSetupUserHeaders()
+        # https://blog.csdn.net/anjingshen/article/details/121459239
         ssl._create_default_https_context = ssl._create_unverified_context
 
     def __doSetupUserHeaders(self):
