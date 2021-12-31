@@ -6,14 +6,15 @@ from selenium.webdriver.common.by import By
 import bs4
 import urllib.request as req
 
-
 class HttpClient:
 
     # 這支有可能給繼承使用，所以 protected 的 _ (單底線)
-    def _obtainHeaders(self):
+    def _obtainHeaders(self, user_headers=None):
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36"
         }
+        if user_headers != None:
+            headers.update(user_headers)
         return headers
 
     def _processGetRequestUrl(self, ori_url, queryParams):
@@ -34,24 +35,26 @@ class HttpClient:
     def _obtainPostFormParamsData(self, formParams):
         pass
 
-    def sendRequest(self, url, method="GET", params=None):
+    def sendRequest(self, url, method="GET", user_headers=None, params=None):
         if method == "GET":
-            return self.sendGetRequest(url, queryParams=params)
+            return self.sendGetRequest(url, user_headers=user_headers, queryParams=params)
         elif method == "POST":
-            return self.sendPostRequest(url, formParams)
+            return self.sendPostRequest(url, user_headers=user_headers, formParams=params)
         else:
-            return self.sendGetRequest(url, queryParams=params)
+            return self.sendGetRequest(url, user_headers=user_headers, queryParams=params)
 
-    def sendGetRequest(self, url, encoded="utf-8", queryParams=None):
-        headers = self._obtainHeaders()
+    def sendGetRequest(self, url, encoded="utf-8", user_headers=None, queryParams=None):
+        headers = self._obtainHeaders(user_headers)
+        # print("url = " + url)
+        # print("headers = " + str(headers))
         url = self._processGetRequestUrl(url, queryParams)
         URL = req.Request(url, headers=headers)
         with req.urlopen(URL) as res:
             pageData = res.read().decode(encoded)
         return pageData
 
-    def sendPostRequest(self, url , encoded="utf-8", formParams=None):
-        headers = self._obtainHeaders()
+    def sendPostRequest(self, url , encoded="utf-8", user_headers=None, formParams=None):
+        headers = self._obtainHeaders(user_headers)
         datas = self._obtainPostFormParamsData(formParams)
         URL = req.Request(url, headers=headers)
         with req.urlopen(URL) as res:
