@@ -77,6 +77,7 @@ class GoldPriceClient():
             if isinstance(df_cache, type(None)) == False:
             # if df_cache not None: # 這種不行
                 df_cache_4_desig_date =  df_cache[(GoldPriceHelper.processDate4GoldPriceDataFrame(df_cache)["date"] == now_date)]
+                # df_cache_4_desig_date =  df_cache[(df_cache["date"] == str(now_date))]
                 if isinstance(df_cache_4_desig_date, type(None)) == False and df_cache_4_desig_date.empty: # 找不到 cache 資料才需要 search
                     search_date_list.append(now_date)
             else:
@@ -98,6 +99,7 @@ class GoldPriceClient():
 
     def _getGoldAPIPriceDictList(self, since=Date.today(), until=Date.today()):
         df_cache = self.__tryLoadCacheDateFrame()
+        # print(df_cache)
         price_list = self.__obtainBasePriceList(df_cache)
 
         if isinstance(since, str):
@@ -107,6 +109,7 @@ class GoldPriceClient():
              until = Date.fromisoformat(until)
 
         need_search_date_list = self.__obtainSearchDateList(since, until, df_cache)
+        # print(need_search_date_list)
         for desig_date in need_search_date_list:
             daily_price = self.__gold_api_client.getDictGoldAPIPrice(date=desig_date)
             price_list.append(daily_price)
@@ -116,18 +119,20 @@ class GoldPriceClient():
         price_list = self._getGoldAPIPriceDictList(since, until)
         df = pd.DataFrame(price_list)
         df = df.sort_values(by=["date"]) # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.sort_values.html
-        df = GoldPriceHelper.filteringDateRange(df, since, until)
-
         if self.__cache_csv_path != None:
             df.to_csv(self.__cache_csv_path, index=False)
 
+        df = GoldPriceHelper.filteringDateRange(df, since, until)
         return df
 
 class GoldPriceHelper:
     @staticmethod
     def parseStrDate(str_api_date):
-        return Date.fromisoformat(str(str_api_date).split("T")[0])
-
+        str_api_date = str(str_api_date)
+        if "T" in str_api_date:
+            return Date.fromisoformat(str_api_date.split("T")[0])
+        else:
+            return Date.fromisoformat(str_api_date)
     @staticmethod
     def processGoldPriceDataFrame(df_price):
         df_price = GoldPriceHelper.processDate4GoldPriceDataFrame(df_price)
@@ -141,6 +146,7 @@ class GoldPriceHelper:
 
     def processDateDataFrame(df_date):
         str_date_list = df_date.values
+        # date_list = [GoldPriceHelper.parseStrDate(str_date) for str_date in str_date_list]
         date_list = [GoldPriceHelper.parseStrDate(str_date) for str_date in str_date_list]
         df_date = date_list
         return df_date
