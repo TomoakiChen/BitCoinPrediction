@@ -115,7 +115,7 @@ class GoldPriceClient():
             price_list.append(daily_price)
         return price_list
 
-    def getGoldAPIPriceDataFrame(self, since=Date.today(), until=Date.today()):
+    def getGoldAPIPriceDataFrame(self, since=Date.today(), until=Date.today(), desig_col_list=None):
         price_list = self._getGoldAPIPriceDictList(since, until)
         df = pd.DataFrame(price_list)
         df = df.sort_values(by=["date"]) # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.sort_values.html
@@ -123,7 +123,10 @@ class GoldPriceClient():
             df.to_csv(self.__cache_csv_path, index=False)
 
         df = GoldPriceHelper.filteringDateRange(df, since, until)
-        return df
+        if(desig_col_list != None):
+            return df
+        else
+            return df[desig_col_list]
 
 class GoldPriceHelper:
     @staticmethod
