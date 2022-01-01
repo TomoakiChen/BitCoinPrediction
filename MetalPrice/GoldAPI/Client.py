@@ -125,7 +125,7 @@ class GoldPriceClient():
         df = GoldPriceHelper.filteringDateRange(df, since, until)
         if(desig_col_list != None):
             return df
-        else
+        else:
             return df[desig_col_list]
 
 class GoldPriceHelper:
