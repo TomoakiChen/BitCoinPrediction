@@ -123,7 +123,15 @@ class GoldPriceClient():
             df.to_csv(self.__cache_csv_path, index=False)
 
         df = GoldPriceHelper.filteringDateRange(df, since, until)
-        if(desig_col_list != None):
+        # print(desig_col_list)
+        # print(desig_col_list != None)
+        # print(desig_col_list not None)
+        # print(desig_col_list not None)
+        #
+
+        if desig_col_list is None:
+        # if desig_col_list != None:
+        # if isinstance(desig_col_list, type(None)) == False:
             return df
         else:
             return df[desig_col_list]
