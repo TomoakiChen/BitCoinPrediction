@@ -49,6 +49,7 @@ class GoldAPIClient(HttpClient):
     def getDictGoldAPIPrice(self, date=None, metal_symbol="XAU", currency="USD"):
         str_price_json = self.getJsonGoldAPIPrice(date, metal_symbol, currency)
         dict_price = json.loads(str_price_json)
+        print(dict_price)
         str_date = dict_price["date"]
         date = MetalPriceHelper.parseStrDate(str_date)
         dict_price["date"] = date
@@ -216,5 +217,5 @@ class SilverPriceClient(MetalPriceClient):
         super().__init__(api_key, "XAG", cache_csv_path, base_url)
 
 class PlatinumPriceClient(MetalPriceClient):
-    def __init__(self, api_key, base_url="https://www.goldapi.io/api", cache_csv_path="./SilverPriceCache.csv"):
+    def __init__(self, api_key, base_url="https://www.goldapi.io/api", cache_csv_path="./PlatinumPriceCache.csv"):
         super().__init__(api_key, "XPT", cache_csv_path, base_url)
