@@ -40,36 +40,3 @@ class NewsInfo:
         result += 'pub_date_time = "' + str(self.__pub_date_time) + '"'  # https://stackoverflow.com/questions/27980579/concatenate-str-and-nonetype-objects
         result += '}'
         return result
-
-# ================================================= 以下暫時寫在這支裡面
-
-"""
-class NewsInfoConverter:
-
-    def __init__(self):
-        pass
-"""
-from PandasHelper import PandasDataFrameHelper
-class NewsInfoHelper:
-
-    @staticmethod
-    def parseInfoList2DataFrame(newsInfoList, desig_col_list=None):
-        return PandasDataFrameHelper.parseObjectList2DataFrame(newsInfoList, NewsInfoHelper.parseInfo2Dict, desig_col_list)
-
-
-    @staticmethod
-    def parseInfoList2DictList(newsInfoList):
-        dict_list = []
-        for newsInfo in newsInfoList:
-            dict = NewsInfoHelper.parseInfo2Dict(newsInfo)
-            dict_list.append(newsInfo)
-        return news_info
-
-    @staticmethod
-    def parseInfo2Dict(newsInfo):
-        dict = {}
-        dict["link"] = newsInfo.getLink()
-        dict["title"] = newsInfo.getTitle()
-        dict["content"] = newsInfo.getContent()
-        dict["pubDateTime"] = newsInfo.getPubDateTime().strftime("%Y-%m-%d %H:%M:%S")
-        return dict
