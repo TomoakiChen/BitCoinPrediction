@@ -409,8 +409,7 @@ class BitCoinComNewsClient(PaginationClient):
         link_url = link_element["href"]
         title = link_element.getText()
 
-        meta_info_element = items_detail_element.find(
-            class_="td-module-meta-info")
+        meta_info_element = items_detail_element.find(class_="td-module-meta-info")
         datetime_eleent = meta_info_element.find("time", class_="entry-date")
         str_pub_datetime = datetime_eleent["datetime"]
         pub_datetime = datetime.fromisoformat(str_pub_datetime)
