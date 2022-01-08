@@ -1,13 +1,14 @@
 import pandas as pd
-from CoinPriceLib import CryptoDatadownloadBinaceClient, CryptoDatadownloadBinaceCsvDataParser
+from CoinPriceLib.Client import CryptoDatadownloadBinaceClient, CryptoDatadownloadBinaceCsvDataParser
 from PandasHelper import PandasDataFrameHelper
+from datetime import datetime as DateTime, date as Date
 
 client = CryptoDatadownloadBinaceClient()
 
-"""
-hourly_df = client.getHourlyDataFrame(desig_col_list=["date", "close"])
-hourly_numpy = CryptoDatadownloadBinaceCsvDataParser.parseCsv2ClosePriceInfo(hourly_df)
-"""
+start = Date.fromisoformat("2022-01-01")
+end = Date.fromisoformat("2022-01-06")
+hourly_df = client.getHourlyDataFrame(desig_col_list=["date", "close"], since=start, until=end)
+print(hourly_df)
 
-hourly_numpy = client.getHourlyClosedPriceNumpy()
-print(hourly_numpy)
+# hourly_numpy = client.getHourlyClosedPriceNumpy()
+# print(hourly_numpy)
