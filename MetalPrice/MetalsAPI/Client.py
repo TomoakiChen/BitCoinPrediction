@@ -5,7 +5,7 @@ from datetime import datetime, date
 import ssl
 import json
 
-class MatalsAPIClient(HttpClient):
+class MetalsAPIClient(HttpClient):
 
     __base_url = None
     __api_key = None
@@ -102,7 +102,7 @@ class GoldPriceClient():
     __metal_api_client = None
 
     def __init__(self, api_key, base_url="https://www.metals-api.com/api"):
-        self.__metal_api_client = MatalsAPIClient(api_key, base_url=base_url)
+        self.__metal_api_client = MetalsAPIClient(api_key, base_url=base_url)
 
     def getJsonPrices(self, start_date=date.today(), end_date=date.today()):
         return self.__metal_api_client.getJsonTimeSeriesData(start_date=start_date, end_date=end_date, base="XAU", symbols=["USD"])

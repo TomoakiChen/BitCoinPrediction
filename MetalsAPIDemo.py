@@ -1,9 +1,9 @@
-from MetalPrice.MetalsAPI.Client import MatalsAPIClient, GoldPriceClient
+from MetalPrice.MetalsAPI.Client import MetalsAPIClient, GoldPriceClient
 import ssl
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
-client = MatalsAPIClient("b7aujpu9wa73t64sx0p4gwiragdv1pziw6029efu8n52xgm87hbcqq632o9l")
+client = MetalsAPIClient("b7aujpu9wa73t64sx0p4gwiragdv1pziw6029efu8n52xgm87hbcqq632o9l")
 # symbol_data = client.getDesigCurrencySymbolDataByCode("XAU")
 # print("symbol.label= " + symbol_data.getLabel())
 
