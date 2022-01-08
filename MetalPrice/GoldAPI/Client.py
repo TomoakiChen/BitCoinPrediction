@@ -27,6 +27,22 @@ class GoldAPIClient(HttpClient):
         path_param_date = path_param_date.replace("-", "")
         return path_param_date
 
+    def __checkHasErrorMsg(self, dict_price):
+        if dict_price.get("error") != None:
+            return True
+        else:
+            return False
+
+    def __processPriceInfo(self, dict_price):
+        str_date = dict_price["date"]
+        date = MetalPriceHelper.parseStrDate(str_date)
+        dict_price["date"] = date
+        return dict_price
+
+    def __processErrorInfo(self, dict_price):
+        error_msg = dict_price["error"]
+        return error_msg
+
     def getJsonStatus(self):
         url = self.__base_url + "/status"
         print(url)
@@ -49,10 +65,15 @@ class GoldAPIClient(HttpClient):
     def getDictGoldAPIPrice(self, date=None, metal_symbol="XAU", currency="USD"):
         str_price_json = self.getJsonGoldAPIPrice(date, metal_symbol, currency)
         dict_price = json.loads(str_price_json)
-        print(dict_price)
-        str_date = dict_price["date"]
-        date = MetalPriceHelper.parseStrDate(str_date)
-        dict_price["date"] = date
+        if  self.__checkHasErrorMsg(dict_price):
+            error_msg = self.__processErrorInfo(dict_price)
+            if True:
+                print(
+                "[GoldAPIClient] getDictGoldAPIPrice(): get error msg= %s, when date= %s, metal_symbol= %s, currency= %s" %
+                (error_msg, date, metal_symbol, currency))
+            dict_price = None
+        else:
+            dict_price = self.__processPriceInfo(dict_price)
         return dict_price
 
 class MetalPriceClient():
@@ -124,7 +145,9 @@ class MetalPriceClient():
         # print(need_search_date_list)
         for desig_date in need_search_date_list:
             daily_price = self.__gold_api_client.getDictGoldAPIPrice(date=desig_date, metal_symbol=self.__metal_code)
-            price_list.append(daily_price)
+            if daily_price != None: # 如果 GoldAPI 回應的是 error msg，則拿到的 daily_price 會是 None
+                price_list.append(daily_price)
+
             if self.__wait_sec != None:
                 print("wait for : " + str(self.__wait_sec) + "sec")
                 time.sleep(self.__wait_sec)
