@@ -3,6 +3,7 @@ from datetime import datetime as DateTime, date as Date, timedelta as TimeDelta
 import pandas as pd
 import json
 import time
+import urllib
 
 # ====================================== 以下算更核心的 Client、Helper ======================================
 class GoldAPIClient(HttpClient):
@@ -128,8 +129,6 @@ class MetalPriceClient():
             price_list = df_cache.to_dict('records') # https://pandas.pydata.org/pandas-docs/version/0.17.0/generated/pandas.DataFrame.to_dict.html#pandas.DataFrame.to_dict
         return price_list
 
-
-
     def _getGoldAPIPriceDictList(self, since=Date.today(), until=Date.today()):
         df_cache = self.__tryLoadCacheDateFrame()
         # print(df_cache)
@@ -144,7 +143,13 @@ class MetalPriceClient():
         need_search_date_list = self.__obtainSearchDateList(since, until, df_cache)
         # print(need_search_date_list)
         for desig_date in need_search_date_list:
-            daily_price = self.__gold_api_client.getDictGoldAPIPrice(date=desig_date, metal_symbol=self.__metal_code)
+            daily_price = None
+            try:
+                daily_price = self.__gold_api_client.getDictGoldAPIPrice(date=desig_date, metal_symbol=self.__metal_code)
+            except urllib.error.HTTPError as ex:
+                print("[MetalPriceClient] _getGoldAPIPriceDictList() HTTPError= %s, search will break" % ex)
+                break
+
             if daily_price != None: # 如果 GoldAPI 回應的是 error msg，則拿到的 daily_price 會是 None
                 price_list.append(daily_price)
 
@@ -165,6 +170,10 @@ class MetalPriceClient():
             return df
         else:
             return df[desig_col_list]
+
+    def close(self):
+        self.__gold_api_client.close()
+
 class MetalPriceHelper:
     @staticmethod
     def parseStrDate(str_api_date):
