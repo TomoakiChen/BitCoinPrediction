@@ -61,6 +61,7 @@ class yfinanceExClient:
         print("[yfinanceExClient] __solveMissingData4MarketRestProblem(): ")
         market_rest_date_list = list(self.__market_rest_date_dict.keys())
         df_missing_list = list()
+        df_missing_list.append(df_result)
         for rest_date in market_rest_date_list:
             fixed_date = self.__market_rest_date_dict[rest_date]
             start_datetime = self.__obtainSearchSinceDateTime(fixed_date, time_zone)
@@ -70,7 +71,8 @@ class yfinanceExClient:
             rest_datetime = self.__obtainSearchSinceDateTime(rest_date, time_zone)
             df_missing.index = [rest_datetime]
             df_missing_list.append(df_missing)
-        print(df_missing_list)
+        df_result = pd.concat(df_missing_list)
+        return df_result
 
     def __solveSinceMoreProblem(self, df_result, since):
         since_datetime = AkiDateTimeUtil.obtainFirstTimeOfDate(since)
@@ -107,7 +109,7 @@ class yfinanceExClient:
             df_hourly_2y = self.__obtainTwoYearsHourlyDataFrame(stock_symbol, col_list)
             df_result = pd.concat([df_daily_overrange, df_hourly_2y])
             df_result = self.__solveMissingData4LastDateProblem(df_result, until)
-            self.__solveMissingData4MarketRestProblem(df_result, stock_symbol, col_list, time_zone)
+            df_result = self.__solveMissingData4MarketRestProblem(df_result, stock_symbol, col_list, time_zone)
             df_result = df_result.resample('H').fillna('pad')
             df_result = self.__solveSinceMoreProblem(df_result, since)
             # df_result["date"] = df_result.index
