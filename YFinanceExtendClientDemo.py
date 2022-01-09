@@ -2,7 +2,7 @@ from StockInfo.YahooFinanceAPI.Client import yfinanceExClient
 import pandas as pd
 
 client = yfinanceExClient()
-df = client.getHourlyData(stock_symbol="^IXIC")
+df = client.getHourlyDataFrame(stock_symbol="^IXIC")
 print(df)
 # print(df.index)
 # df2 = df[(df.index >= pd.to_datetime("2020-01-01 00:00:00"))]
