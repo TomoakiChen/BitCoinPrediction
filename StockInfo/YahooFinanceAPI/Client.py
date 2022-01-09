@@ -58,6 +58,7 @@ class yfinanceExClient:
         return df_result
 
     def __solveMissingData4MarketRestProblem(self, df_result, stock_symbol, col_list, time_zone):
+        print("[yfinanceExClient] __solveMissingData4MarketRestProblem(): ")
         market_rest_date_list = list(self.__market_rest_date_dict.keys())
         df_missing_list = list()
         for rest_date in market_rest_date_list:
