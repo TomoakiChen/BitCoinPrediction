@@ -68,7 +68,7 @@ class yfinanceExClient:
             df_missing = yfinance.download(stock_symbol, start=start_datetime, end=end_datetime, interval = "1d")
             df_missing  = df_missing[col_list]
             rest_datetime = self.__obtainSearchSinceDateTime(rest_date, time_zone)
-            df_missing.index = list(rest_datetime)
+            df_missing.index = [rest_datetime]
             df_missing_list.append(df_missing)
         print(df_missing_list)
 
