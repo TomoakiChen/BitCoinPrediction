@@ -72,7 +72,7 @@ class yfinanceExClient:
             print("[yfinanceExClient] getHourlyData(): limit_since_datetime=%s, overrange_since_datetime= %s, overrange_until_datetime= %s"
                  % (limit_since_datetime, overrange_since_datetime, overrange_until_datetime))
 
-            print( yfinance.download(stock_symbol, start="2019-12-31", end="2020-01-02", interval = "1d"))
+            # print( yfinance.download(stock_symbol, start="2019-12-31", end="2020-01-02", interval = "1d"))
 
             df_daily_overrange = yfinance.download(stock_symbol, start=overrange_since_datetime, end=overrange_until_datetime, interval = "1d")
             df_hourly_2y = yfinance.download(stock_symbol, period="2y", interval = "1h")
