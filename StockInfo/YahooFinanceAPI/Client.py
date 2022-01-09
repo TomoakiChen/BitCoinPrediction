@@ -64,9 +64,12 @@ class yfinanceExClient:
         for rest_date in market_rest_date_list:
             fixed_date = self.__market_rest_date_dict[rest_date]
             start_datetime = self.__obtainSearchSinceDateTime(fixed_date, time_zone)
-            end_datetime = self.__obtainSearchSinceDateTime(fixed_date, time_zone)
+            end_datetime = self.__obtainSearchSinceDateTime(fixed_date, time_zone) + TimeDelta(days=1)
             df_missing = yfinance.download(stock_symbol, start=start_datetime, end=end_datetime, interval = "1d")
-            df_missing_list.append(df_missing[col_list])
+            df_missing  = df_missing[col_list]
+            rest_datetime = self.__obtainSearchSinceDateTime(rest_date)
+            df_missing.index = list(rest_datetime)
+            df_missing_list.append(df_missing)
         print(df_missing_list)
 
     def __solveSinceMoreProblem(self, df_result, since):
