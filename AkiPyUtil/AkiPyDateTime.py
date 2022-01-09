@@ -28,6 +28,8 @@ class AkiDateTimeUtil:
     def obtainFirstTimeOfDate(desig_date):
         desig_datetime = None
         if desig_date != None:
+            if isinstance(desig_date, str):
+                desig_date = Date.fromisoformat(desig_date)
             desig_datetime = DateTime.combine(desig_date, DateTime.min.time())
         return desig_datetime
 
@@ -35,5 +37,7 @@ class AkiDateTimeUtil:
     def obtainLastTimeOfDate(desig_date):
         desig_datetime = None
         if desig_date != None:
+            if isinstance(desig_date, str):
+                desig_date = Date.fromisoformat(desig_date)            
             desig_datetime = DateTime.combine(desig_date, DateTime.max.time())
         return desig_datetime

@@ -76,7 +76,9 @@ class yfinanceExClient:
 
             df_daily_overrange = yfinance.download(stock_symbol, start=overrange_since_datetime, end=overrange_until_datetime, interval = "1d")
             df_hourly_2y = yfinance.download(stock_symbol, period="2y", interval = "1h")
+
             df_daily_overrange = df_daily_overrange[col_list]
+
             df_hourly_2y = df_hourly_2y[col_list]
             new_index_list = [pd.to_datetime(str(the_index).replace('-05:00', '').replace('-04:00', '')) for the_index in df_hourly_2y.index]
             df_hourly_2y.index = new_index_list
