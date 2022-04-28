@@ -1,4 +1,5 @@
-from CoinPriceLib import CryptoDatadownloadBinaceClient, CrpytoDatadownloadBinanceDataHelper
+from CoinPriceLib.Client import CryptoDatadownloadBinaceClient
+from CoinPriceLib.Helper import CrpytoDatadownloadBinanceDataHelper
 import pandas as pd
 from datetime import datetime, timedelta
 
