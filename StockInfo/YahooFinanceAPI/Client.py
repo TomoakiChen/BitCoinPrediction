@@ -57,6 +57,20 @@ class yfinanceExClient:
         # print(df_result)
         return df_result
 
+    def __solveDailyMissingData4MarketRestProblem(self, df_result, stock_symbol, col_list):
+        market_rest_date_list = list(self.__market_rest_date_dict.keys())
+        df_missing_list = list()
+        df_missing_list.append(df_result)
+        for rest_date in market_rest_date_list:
+            fixed_date = self.__market_rest_date_dict[rest_date]
+            df_missing = yfinance.download(stock_symbol, start=fixed_date, end=fixed_date, interval = "1h")
+            df_missing  = df_missing[col_list]
+            rest_date = pd.to_datetime(rest_date)
+            df_missing.index = [rest_date]
+            df_missing_list.append(df_missing)
+        df_result = pd.concat(df_missing_list)
+        return df_result
+
     def __solveMissingData4MarketRestProblem(self, df_result, stock_symbol, col_list, time_zone):
         print("[yfinanceExClient] __solveMissingData4MarketRestProblem(): ")
         market_rest_date_list = list(self.__market_rest_date_dict.keys())
@@ -69,8 +83,8 @@ class yfinanceExClient:
             df_missing = yfinance.download(stock_symbol, start=start_datetime, end=end_datetime, interval = "1d")
             df_missing  = df_missing[col_list]
             rest_datetime = pd.to_datetime(rest_date)
-            print(df_missing.index)
-            print([rest_datetime])
+            # print(df_missing.index)
+            # print([rest_datetime])
             df_missing.index = [rest_datetime]
             df_missing_list.append(df_missing)
         df_result = pd.concat(df_missing_list)
@@ -120,6 +134,12 @@ class yfinanceExClient:
             df_result = df_range[col_list]
 
         return df_result
+
+    def getDailyDataFrame(self, stock_symbol, since=Date.fromisoformat("2020-01-01"), until=Date.today(), time_zone=TimeZone("US/Eastern"), col_list=["Close"]):
+        df_range = yfinance.download(stock_symbol, start=since, end=until, interval="1h")
+        df_result = df_range[col_list]
+        return df_result
+
 
     # def getHourlyData(self, stock_symbol, since=Date.fromisoformat("2020-01-01"), until=Date.today(), time_zone=TimeZone("US/Eastern"), col_list=["Close"]):
     #     since_datetime = self.__obtainSearchSinceDateTime(since, time_zone)
