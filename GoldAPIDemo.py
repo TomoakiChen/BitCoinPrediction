@@ -16,7 +16,7 @@ api_key = "goldapi-14sk9jtkxqaji16-io" # nccu
 # api_key = "goldapi-2rdpxtkxtumogz-io" # nccu-g
 # api_key = "goldapi-31ny7fitkxwbzc7l-io"
 since = "2021-07-01"
-until = "2021-12-31"
+until = "2022-01-11"
 gold_price_client = GoldPriceClient(api_key)
 df_price = gold_price_client.getGoldAPIPriceDataFrame(since=since, desig_col_list=["date", "price"])
 gold_price_client.close()
